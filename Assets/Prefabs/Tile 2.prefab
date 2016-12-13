@@ -116,7 +116,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 05e6f2404154bd545ac3485e4e306ac9, type: 2}
+  - {fileID: 2100000, guid: de7597221a371ab4ca831bab3c7d1355, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_ProbeAnchor: {fileID: 0}
@@ -145,7 +145,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: edc94c2a06a39e14a82da0fc10c7082a, type: 2}
+  - {fileID: 2100000, guid: 9ec99196160dd4d4fa8f88295398c3a5, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_ProbeAnchor: {fileID: 0}

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class SpawnManager : MonoBehaviour {
 
 	public GameObject[] prefabs;
+	public GameObject[] backgrounds;
 	public GameObject wall;
 
 	private Transform player;
@@ -41,6 +42,7 @@ public class SpawnManager : MonoBehaviour {
 	private void Spawn(int prefabIndex = -1) {
 		GameObject prefab;
 		GameObject borders;
+		GameObject background;
 
 		//spawn random prefab
 		if (prefabIndex == -1) {
@@ -54,12 +56,29 @@ public class SpawnManager : MonoBehaviour {
 		borders = Instantiate (wall) as GameObject;
 		borders.transform.SetParent (transform);
 		borders.transform.position = Vector3.forward * spawnAxisZ;
+
+		//add background
+		background = Instantiate(backgrounds[RandomBackgroundID()]) as GameObject;
+		//background.transform.SetParent(transform);
+
 		//add wall as child of prefab for deletion
+		background.transform.SetParent(prefab.transform);
 		borders.transform.SetParent (prefab.transform);
+		background.transform.position = new Vector3(0, -1, 1 * spawnAxisZ + prefabLength/2);
 
 		spawnAxisZ += prefabLength;
 		listOfPrefabs.Add (prefab);
 	
+	}
+
+	private int RandomBackgroundID() {
+		int backgroundsL = backgrounds.Length;
+		if (backgroundsL <= 1) {
+			return 0;
+		}
+		int randomID = Random.Range (0, backgroundsL);
+		return randomID;
+
 	}
 
 	private int RandomPrefabID() {

@@ -13,6 +13,10 @@ public class CameraStable : MonoBehaviour {
 		offset = transform.position - target.position;
 		
 	}
+
+	void Update() {
+		transform.position = Vector3.Lerp (transform.position, moveVector, smoothing * Time.deltaTime);
+	}
 	
 	void FixedUpdate() {
 		moveVector = target.position + offset;
@@ -21,6 +25,6 @@ public class CameraStable : MonoBehaviour {
 		moveVector.x = 0;
 		moveVector.y = Mathf.Clamp(moveVector.y, 3, 5);
 		
-		transform.position = Vector3.Lerp(transform.position, moveVector, smoothing * Time.deltaTime);
+		//transform.position = Vector3.Lerp(transform.position, moveVector, smoothing * Time.deltaTime);
 	}
 }

@@ -7,35 +7,47 @@ public class SpawnManager : MonoBehaviour {
 	public GameObject[] prefabs;
 	public GameObject[] backgrounds;
 	public GameObject wall;
+	public GameObject coin;
 
 	private Transform player;
 	private List<GameObject> listOfPrefabs = new List<GameObject> ();
 
 	private float spawnAxisZ = -5.0f;
+	//amount of prefabs per area
+	private int amntPrefabs = 10;
 	private float prefabLength = 25.0f;
 	//number of prefabs visible
-	private int preRenders = 5;
+	private int preRenders = 7;
 	//safety area for despawn
-	private float offset = 50.0f;
+	private float offset = 75.0f;
 	//ID of last used prefab
-	private int prefabID = 1;
+	private int prefabID = 2;
+	//number of coins
+	private int amntCoins = 3;
 
 	// Use this for initialization
 	void Start () {
 		player = GameObject.FindGameObjectWithTag ("Player").transform;
 		//spawn Start prefab
 		Spawn (0);
-		for (int i = 1; i < preRenders; i++) {
+		for (int i = 2; i < preRenders; i++) {
 			Spawn ();
 		}
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		//spawn and remove prefabs
-		if (player.position.z - offset > (spawnAxisZ - preRenders * prefabLength)) {
-			Spawn();
+
+		if (amntPrefabs == 0 && player.position.z - offset > (spawnAxisZ - preRenders * prefabLength)) {
+			Spawn (1);
 			RemoveOld ();
+			amntPrefabs = -1;
+		} else {
+			//spawn and remove prefabs
+			if (amntPrefabs > 0 && player.position.z - offset > (spawnAxisZ - preRenders * prefabLength)) {
+				Spawn ();
+				RemoveOld ();
+			}
 		}
 	}
 
@@ -43,6 +55,7 @@ public class SpawnManager : MonoBehaviour {
 		GameObject prefab;
 		GameObject borders;
 		GameObject background;
+		GameObject coinSpawn;
 
 		//spawn random prefab
 		if (prefabIndex == -1) {
@@ -52,20 +65,34 @@ public class SpawnManager : MonoBehaviour {
 		}
 		prefab.transform.SetParent (transform);
 		prefab.transform.position = Vector3.forward * spawnAxisZ;
+
 		//add invisible wall
 		borders = Instantiate (wall) as GameObject;
 		borders.transform.SetParent (transform);
-		borders.transform.position = Vector3.forward * spawnAxisZ;
 
 		//add background
 		background = Instantiate(backgrounds[RandomBackgroundID()]) as GameObject;
-		//background.transform.SetParent(transform);
 
-		//add wall as child of prefab for deletion
+		//add wall, background as child of prefab for deletion
 		background.transform.SetParent(prefab.transform);
 		borders.transform.SetParent (prefab.transform);
-		background.transform.position = new Vector3(0, -1, 1 * spawnAxisZ + prefabLength/2);
 
+		background.transform.position = new Vector3(0, -1, 1 * spawnAxisZ + prefabLength/2);
+		borders.transform.position = Vector3.forward * spawnAxisZ;
+
+		//spawn coin
+		if (amntCoins > 0) {
+			int flipcoin = Random.Range (0, 2);
+			if (((amntPrefabs > amntCoins) && (flipcoin == 1)) || (amntPrefabs <= amntCoins)) {
+				coinSpawn = Instantiate (coin) as GameObject;
+				coinSpawn.transform.SetParent (transform);
+				coinSpawn.transform.position = new Vector3(0, 0.6f, 1 * spawnAxisZ + 5);
+				coinSpawn.transform.SetParent (prefab.transform);
+				amntCoins--;
+			}		
+		}
+
+		amntPrefabs--;
 		spawnAxisZ += prefabLength;
 		listOfPrefabs.Add (prefab);
 	
@@ -90,7 +117,7 @@ public class SpawnManager : MonoBehaviour {
 
 		int randomID = prefabID;
 		while (randomID == prefabID) {
-			randomID = Random.Range (1, prefabsL);
+			randomID = Random.Range (2, prefabsL);
 		}
 		prefabID = randomID;
 		return randomID;

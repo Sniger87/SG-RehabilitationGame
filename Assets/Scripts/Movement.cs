@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Linq;
 using UnityEngine;
+using Wii.Input.Contracts;
 using Wii.Input.Controllers;
 using Wii.Input.DesktopFacades;
+using Wii.Input.Exceptions;
 
 public class Movement : MonoBehaviour
 {
@@ -23,11 +25,15 @@ public class Movement : MonoBehaviour
 
         try
         {
-            balanceBoard = null; //WiiInputManager.Current.FindAllWiiControllers().FirstOrDefault() as BalanceBoard;
+            balanceBoard = WiiInputManager.Current.FindAllWiiControllers().Where(c => c.ControllerType == ControllerType.WiiBalanceBoard).FirstOrDefault() as BalanceBoard;
         }
-        catch (System.Exception)
+        catch (WiiControllerNotFoundException)
         {
-
+            // Kein Controller angeschlossen
+        }
+        catch (System.Exception e)
+        {
+            throw e;
         }
     }
 

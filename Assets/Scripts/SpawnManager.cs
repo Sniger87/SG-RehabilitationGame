@@ -23,7 +23,7 @@ public class SpawnManager : MonoBehaviour {
 	//ID of last used prefab
 	private int prefabID = 2;
 	//number of coins
-	private int amntCoins = 3;
+	private int amntCoins = 5;
 
 	// Use this for initialization
 	void Start () {
@@ -82,11 +82,21 @@ public class SpawnManager : MonoBehaviour {
 
 		//spawn coin
 		if (amntCoins > 0) {
+			//randomly add a coin
 			int flipcoin = Random.Range (0, 2);
+
 			if (((amntPrefabs > amntCoins) && (flipcoin == 1)) || (amntPrefabs <= amntCoins)) {
+
+				Vector3 coinPosition = new Vector3 (Random.Range (-4, 4), 0.6f, spawnAxisZ + Random.Range (1, 22));
+				//determine random position
+				while((Physics.OverlapSphere (coinPosition, 0.6f)).Length != 0) {
+					coinPosition = new Vector3 (Random.Range (-4, 4), 0.6f, spawnAxisZ + Random.Range (1, 22));				
+					//Debug.Log ("Overlap");
+				}
+				//Debug.Log ("No overlap occurred at tile " + amntPrefabs.ToString ());
 				coinSpawn = Instantiate (coin) as GameObject;
 				coinSpawn.transform.SetParent (transform);
-				coinSpawn.transform.position = new Vector3(0, 0.6f, 1 * spawnAxisZ + 5);
+				coinSpawn.transform.position = coinPosition;
 				coinSpawn.transform.SetParent (prefab.transform);
 				amntCoins--;
 			}		

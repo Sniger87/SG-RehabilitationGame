@@ -7,6 +7,8 @@ public class Collision : MonoBehaviour {
 
 	public Text counter;
 	public Text collisions;
+	public Text finish;
+
 	public AudioClip coinAudioFX;
 	public AudioClip obstacleAudioFX;
 	public AudioClip coinVisualFX;
@@ -25,19 +27,26 @@ public class Collision : MonoBehaviour {
 
 	void OnTriggerEnter (Collider col) {
 		if (col.gameObject.tag == "Obstacle") {
+			Destroy (col.gameObject);
 			collisionCounter++;
 			SetText ();
 			PlayFX (obstacleAudioFX);
 			VisualizeFX (obstacleVisualFX);
-			Destroy (col.gameObject);
 		}
 
 		if (col.gameObject.tag == "Coin") {
+			Destroy (col.gameObject);
 			coinsCollected++;
 			SetText ();
 			PlayFX (coinAudioFX);
 			VisualizeFX (coinVisualFX);
-			Destroy (col.gameObject);
+		}
+
+		if (col.gameObject.tag == "Finish") {
+			Debug.Log ("Finished~");
+			//finish.text = "Fertig!  " + "Eingesammelte Münzen: " + coinsCollected.ToString ();
+			//finish.enabled = true;
+			//start transition sequence & load new level
 		}
 	}
 

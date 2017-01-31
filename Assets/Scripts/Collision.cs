@@ -11,17 +11,17 @@ public class Collision : MonoBehaviour {
 
 	public AudioClip coinAudioFX;
 	public AudioClip obstacleAudioFX;
-	public AudioClip coinVisualFX;
-	public AudioClip obstacleVisualFX;
+	//public AudioClip coinVisualFX;
+	//public AudioClip obstacleVisualFX;
 
 	private int coinsCollected = 0;
 	private int collisionCounter = 0;
 	private AudioSource sourceAudio = null;
-	private ParticleSystem sourceVisual = null;
+	//private ParticleSystem sourceVisual = null;
 
 	void Start() {
 		sourceAudio = gameObject.AddComponent<AudioSource>(); 
-		sourceVisual = gameObject.AddComponent<ParticleSystem> ();
+		//sourceVisual = gameObject.AddComponent<ParticleSystem> ();
 		//sourceVisual.main.loop = false;
 	}
 
@@ -31,7 +31,7 @@ public class Collision : MonoBehaviour {
 			collisionCounter++;
 			SetText ();
 			PlayFX (obstacleAudioFX);
-			VisualizeFX (obstacleVisualFX);
+			//VisualizeFX (obstacleVisualFX);
 		}
 
 		if (col.gameObject.tag == "Coin") {
@@ -39,7 +39,7 @@ public class Collision : MonoBehaviour {
 			coinsCollected++;
 			SetText ();
 			PlayFX (coinAudioFX);
-			VisualizeFX (coinVisualFX);
+			//VisualizeFX (coinVisualFX);
 		}
 
 		if (col.gameObject.tag == "Finish") {

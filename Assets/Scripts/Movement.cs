@@ -14,7 +14,7 @@ public class Movement : MonoBehaviour
     private BalanceBoard balanceBoard;
 
     //artificial gravity
-    private float vertVelo = 0.0f;
+    private float vertVelo = 0.5f;
     private float gravity = 12.0f;
 
     public float Speed = 3.0f;
@@ -22,48 +22,31 @@ public class Movement : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
-
-        try
-        {
+        try {
             balanceBoard = WiiInputManager.Current.FindAllWiiControllers().Where(c => c.ControllerType == ControllerType.WiiBalanceBoard).FirstOrDefault() as BalanceBoard;
-        }
-        catch (WiiControllerNotFoundException)
-        {
+        } catch (WiiControllerNotFoundException) {
             // Kein Controller angeschlossen
-        }
-        catch (System.Exception e)
-        {
+        } catch (System.Exception e) {
             throw e;
         }
     }
 
     // Update is called once per frame
-    void Update()
-    {
-
+	void Update() {
         moveVector = Vector3.zero;
-
-        if (controller.isGrounded)
-        {
-            vertVelo = -0.5f;
-        }
-        else
-        {
+		if (controller.isGrounded) {
+            vertVelo = 0.5f;
+        } else {
             vertVelo -= gravity * Time.deltaTime;
-        }
-
-        if (balanceBoard != null)
-        {
+        } 
+		if (balanceBoard != null) {
             balanceBoard.UpdateState();
             moveVector.x = balanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.BottomRight * Speed;
+        } else {
+			moveVector.x = Input.GetAxisRaw ("Horizontal") * Speed;
         }
-        else
-        {
-            moveVector.x = Input.GetAxisRaw("Horizontal") * Speed;
-        }
-
-        moveVector.y = vertVelo;
-        moveVector.z = Speed;
+		moveVector.y = vertVelo;
+		moveVector.z = Speed;
         controller.Move(moveVector * Time.deltaTime);
     }
 }

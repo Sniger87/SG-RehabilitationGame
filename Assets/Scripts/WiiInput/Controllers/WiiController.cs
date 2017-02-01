@@ -392,6 +392,7 @@ namespace Wii.Input.Controllers
             else
             {
                 // Read Status from Memory
+                //Thread.Sleep(100);
                 if (!ReadReport())
                 {
                     Debug.WriteLine("Read failed: ReadData");
@@ -456,7 +457,14 @@ namespace Wii.Input.Controllers
                 this.HIDDevicePath = WiiInputManager.Current.SearchWiiController(this.ControllerType);
             }
 
-            OpenWiiControllerDeviceHandle(this.HIDDevicePath);
+            try
+            {
+                OpenWiiControllerDeviceHandle(this.HIDDevicePath);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
         }
 
         internal void OpenWiiControllerDeviceHandle(string devicePath)
@@ -499,23 +507,23 @@ namespace Wii.Input.Controllers
 
         protected bool ReadReport()
         {
-            //byte[] buff = new byte[REPORT_LENGTH];
+            byte[] buff = new byte[REPORT_LENGTH];
 
-            //uint numberOfBytesRead = 0;
+            uint numberOfBytesRead = 0;
 
-            //NativeOverlapped overlapped = new NativeOverlapped();
-            //overlapped.EventHandle = IntPtr.Zero;
-            //overlapped.OffsetHigh = 0;
-            //overlapped.OffsetLow = 0;
+            NativeOverlapped overlapped = new NativeOverlapped();
+            overlapped.EventHandle = IntPtr.Zero;
+            overlapped.OffsetHigh = 0;
+            overlapped.OffsetLow = 0;
 
-            //if (HIDImports.ReadFile(this.SafeFileHandle.DangerousGetHandle(), buff, (uint)buff.Length, out numberOfBytesRead, ref overlapped))
-            //{
-            //    return ParseInputReport(buff);
-            //}
+            if (HIDImports.ReadFile(this.SafeFileHandle.DangerousGetHandle(), buff, (uint)buff.Length, out numberOfBytesRead, ref overlapped))
+            {
+                return ParseInputReport(buff);
+            }
 
-            //return false;
+            return false;
 
-            return Reader();
+            //return Reader();
         }
 
         private bool Reader()
@@ -557,8 +565,6 @@ namespace Wii.Input.Controllers
                     }
                 }
             }
-
-            readDone.Set();
 
             // parse it
             if (buff != null)

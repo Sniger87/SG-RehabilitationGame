@@ -84,15 +84,20 @@ namespace Profiles
             int playerId = this.Players.Count;
             string playerFolderName = string.Format("{0}_{1}", PlayerFolderPrefix, playerId);
 
-            string directoryPath = Path.Combine(ConfigManager.GameFolderName, playerFolderName);
+            string directoryPath = Path.Combine(ConfigManager.Current.GameDirectoryPath, playerFolderName);
 
             FileManager.CreateDirectory(directoryPath);
 
-            Player p = new Player(playerId, name, directoryPath);
+            string playerConfigName = string.Format("{0}_{1}.cfg", PlayerFolderPrefix, playerId);
+            string configFilePath = Path.Combine(directoryPath, playerConfigName);
+
+            FileManager.Create(configFilePath);
+
+            Player p = new Player(playerId, name, directoryPath, configFilePath);
 
             this.Players.Add(p);
 
-            ConfigManager.Current.GameConfig.PlayersDirectoryPath.Add(directoryPath);
+            ConfigManager.Current.GameConfig.PlayersConfigPath.Add(configFilePath);
 
             return p;
         }
@@ -101,9 +106,9 @@ namespace Profiles
         {
             this.Players.Clear();
 
-            foreach (string playerFolderPath in ConfigManager.Current.GameConfig.PlayersDirectoryPath)
+            foreach (string playerConfigPath in ConfigManager.Current.GameConfig.PlayersConfigPath)
             {
-                string content = FileManager.Read(playerFolderPath);
+                string content = FileManager.Read(playerConfigPath);
                 Player p = JsonUtility.FromJson<Player>(content);
                 this.Players.Add(p);
             }
@@ -126,6 +131,15 @@ namespace Profiles
         public void WriteFileAtCurrentPlayer()
         {
 
+        }
+
+        public void SavePlayers()
+        {
+            foreach (Player player in this.Players)
+            {
+                string content = JsonUtility.ToJson(player);
+                FileManager.Write(player.ConfigFilePath, content);
+            }
         }
         #endregion
     }

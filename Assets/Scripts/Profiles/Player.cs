@@ -8,11 +8,21 @@ namespace Profiles
     public class Player
     {
         #region Eigenschaften
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string DirectoryPath { get; set; }
-        public List<int> Highscores { get; set; }
-        public List<string> MovementFileNames { get; set; }
+        public int Id;
+
+        public int Coins;
+
+        public int Collisions;
+
+        public string Name;
+
+        public string DirectoryPath;
+
+        public string ConfigFilePath;
+
+        public List<int> Highscores;
+
+        public List<string> MovementFileNames;
         #endregion
 
         #region Konstruktor
@@ -21,11 +31,12 @@ namespace Profiles
 
         }
 
-        public Player(int id, string name, string directoryPath)
+        public Player(int id, string name, string directoryPath, string configFilePath)
         {
             this.Id = id;
             this.Name = name;
             this.DirectoryPath = directoryPath;
+            this.ConfigFilePath = configFilePath;
             this.Highscores = new List<int>();
             this.MovementFileNames = new List<string>();
         }

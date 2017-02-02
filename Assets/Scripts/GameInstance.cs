@@ -10,6 +10,9 @@ public class GameInstance : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        // make GameInstance persistent
+        DontDestroyOnLoad(this);
+
         // Wichtig! Reigenfolge muss zur initialisierung eingehalten werden
         ConfigManager.Current.LoadGameConfig();
         ProfileManager.Current.LoadPlayers();
@@ -20,6 +23,10 @@ public class GameInstance : MonoBehaviour
         {
             currentPlayer = ProfileManager.Current.CreatePlayer("Default");
         }
+        else
+        {
+            currentPlayer = ProfileManager.Current.Players.FirstOrDefault();
+        }
         ProfileManager.Current.CurrentPlayer = currentPlayer;
     }
 
@@ -27,5 +34,12 @@ public class GameInstance : MonoBehaviour
     void Update()
     {
 
+    }
+
+    private void OnDestroy()
+    {
+        // Wichtig! Reigenfolge muss eingehalten werden
+        ProfileManager.Current.SavePlayers();
+        ConfigManager.Current.SaveGameConfig();
     }
 }

@@ -10,8 +10,8 @@ using Wii.Contracts;
 public class Movement : MonoBehaviour
 {
     private CharacterController controller;
+    private BalanceBoardInstance balanceBoardInstance;
     private Vector3 moveVector;
-    private BalanceBoard balanceBoard;
 
     //artificial gravity
     private float vertVelo = 0.5f;
@@ -22,18 +22,7 @@ public class Movement : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
-        try
-        {
-            balanceBoard = WiiInputManager.Current.FindWiiController(ControllerType.WiiBalanceBoard) as BalanceBoard;
-        }
-        catch (WiiControllerNotFoundException)
-        {
-            // Kein Controller angeschlossen
-        }
-        catch (System.Exception e)
-        {
-            throw e;
-        }
+        balanceBoardInstance = GetComponent<BalanceBoardInstance>();
     }
 
     // Update is called once per frame
@@ -48,15 +37,14 @@ public class Movement : MonoBehaviour
         {
             vertVelo -= gravity * Time.deltaTime;
         }
-        if (balanceBoard != null)
+
+        if (balanceBoardInstance != null)
         {
-            balanceBoard.GetUpdate();
-            moveVector.x = balanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.BottomRight * Speed;
+            moveVector.x = balanceBoardInstance.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.BottomRight * Speed;
         }
-        else
-        {
-            moveVector.x = Input.GetAxisRaw("Horizontal") * Speed;
-        }
+
+        moveVector.x = Input.GetAxisRaw("Horizontal") * Speed;
+
         moveVector.y = vertVelo;
         moveVector.z = Speed;
         controller.Move(moveVector * Time.deltaTime);

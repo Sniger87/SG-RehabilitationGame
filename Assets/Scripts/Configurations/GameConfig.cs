@@ -1,19 +1,22 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Configurations
 {
     [Serializable]
     public class GameConfig
     {
-        public int VolumeLevel { get; set; }
-        public bool Mute { get; set; }
-        public List<string> PlayersDirectoryPath { get; set; }
+        public int VolumeLevel;
+
+        public bool Mute;
+
+        public List<string> PlayersConfigPath;
 
         public GameConfig()
         {
-
+            this.PlayersConfigPath = new List<string>();
         }
     }
 }

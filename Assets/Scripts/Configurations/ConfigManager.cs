@@ -19,6 +19,8 @@ namespace Configurations
 
         private string gameDirectoryPath;
 
+        private string gameConfigPath;
+
         private GameConfig gameConfig;
 
         #endregion
@@ -51,6 +53,21 @@ namespace Configurations
             }
         }
 
+        public string GameConfigPath
+        {
+            get
+            {
+                return this.gameConfigPath;
+            }
+            private set
+            {
+                if (value != this.gameConfigPath)
+                {
+                    this.gameConfigPath = value;
+                }
+            }
+        }
+
         public GameConfig GameConfig
         {
             get
@@ -72,6 +89,7 @@ namespace Configurations
         {
             string myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             this.GameDirectoryPath = Path.Combine(myDocuments, GameFolderName);
+            this.GameConfigPath = Path.Combine(GameDirectoryPath, GameConfigFileName);
         }
         #endregion
 
@@ -83,15 +101,14 @@ namespace Configurations
                 FileManager.CreateDirectory(this.GameDirectoryPath);
             }
 
-            string configPath = Path.Combine(this.GameDirectoryPath, GameConfigFileName);
-
-            if (!File.Exists(configPath))
+            if (!File.Exists(this.GameConfigPath))
             {
-                CreateGameConfig(configPath);
+                CreateGameConfig(this.GameConfigPath);
+                this.GameConfig = new GameConfig();
             }
             else
             {
-                string content = FileManager.Read(configPath);
+                string content = FileManager.Read(this.GameConfigPath);
                 this.GameConfig = JsonUtility.FromJson<GameConfig>(content);
             }
         }
@@ -99,6 +116,12 @@ namespace Configurations
         private void CreateGameConfig(string path)
         {
             FileManager.Create(path);
+        }
+
+        public void SaveGameConfig()
+        {
+            string content = JsonUtility.ToJson(this.GameConfig);
+            FileManager.Write(this.GameConfigPath, content);
         }
         #endregion
     }

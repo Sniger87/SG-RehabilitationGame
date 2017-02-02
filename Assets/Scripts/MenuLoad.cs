@@ -9,5 +9,6 @@ public class MenuLoad : MonoBehaviour {
 	public void Load(int id) {
 		loadImage.SetActive (true);
 		SceneManager.LoadScene (id);
+        //TODO: Scenen  hinzufügen
 	}
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Wii.Input.Contracts
+namespace Wii.Contracts
 {
     /// <summary>
     /// The 4 sensors on the Balance Board (short values)

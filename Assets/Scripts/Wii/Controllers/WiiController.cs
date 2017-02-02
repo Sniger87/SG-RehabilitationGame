@@ -4,18 +4,18 @@ using System.Diagnostics;
 using System.IO;
 using Microsoft.Win32.SafeHandles;
 using System.Threading;
-using Wii.Input.Events;
-using Wii.Input.Contracts;
-using Wii.Input.Exceptions;
-using Wii.Input.DesktopFacades;
-using Wii.Input.Collections;
+using Wii.Events;
+using Wii.Contracts;
+using Wii.Exceptions;
+using Wii.DesktopFacades;
+using Wii.Collections;
 using System.Linq;
 using System.Collections.Generic;
 
 //  See http://www.codeplex.com/WiiControllerLib
 //  See http://wiibrew.org/wiki/WiiController
 
-namespace Wii.Input.Controllers
+namespace Wii.Controllers
 {
     /// <summary>
     /// Implementation of WiiController

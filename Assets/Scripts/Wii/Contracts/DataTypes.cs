@@ -1,6 +1,6 @@
 using System;
 
-namespace Wii.Input.Contracts
+namespace Wii.Contracts
 {
     sealed class DataContract : Attribute
     {

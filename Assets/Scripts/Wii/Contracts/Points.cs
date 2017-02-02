@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Wii.Input.Contracts
+namespace Wii.Contracts
 {
     /// <summary>
     /// Point structure for floating point 2D positions (X, Y)

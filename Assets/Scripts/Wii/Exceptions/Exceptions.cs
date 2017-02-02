@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Wii.Input.Exceptions
+namespace Wii.Exceptions
 {
     /// <summary>
     /// Thrown when no WiiControllers are found in the HID device list

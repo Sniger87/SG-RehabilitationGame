@@ -1,4 +1,4 @@
-﻿namespace Wii.Input.Contracts
+﻿namespace Wii.Contracts
 {
     // WiiController output commands
     internal enum OutputReport : byte

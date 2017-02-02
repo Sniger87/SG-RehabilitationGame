@@ -5,12 +5,12 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
-using Wii.Input.Collections;
-using Wii.Input.Contracts;
-using Wii.Input.Controllers;
-using Wii.Input.Exceptions;
+using Wii.Collections;
+using Wii.Contracts;
+using Wii.Controllers;
+using Wii.Exceptions;
 
-namespace Wii.Input.DesktopFacades
+namespace Wii.DesktopFacades
 {
     public class WiiInputManager
     {

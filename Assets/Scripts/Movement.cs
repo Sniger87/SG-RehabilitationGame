@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.Linq;
 using UnityEngine;
-using Wii.Input.Controllers;
-using Wii.Input.DesktopFacades;
-using Wii.Input.Events;
-using Wii.Input.Exceptions;
-using Wii.Input.Contracts;
+using Wii.Controllers;
+using Wii.DesktopFacades;
+using Wii.Events;
+using Wii.Exceptions;
+using Wii.Contracts;
 
 public class Movement : MonoBehaviour
 {

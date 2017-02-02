@@ -1,4 +1,4 @@
-﻿namespace Wii.Input.Contracts
+﻿namespace Wii.Contracts
 {
     /// <summary>
     /// The report format in which the WiiController should return data

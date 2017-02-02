@@ -4,10 +4,10 @@ using System.IO;
 using Microsoft.Win32.SafeHandles;
 using System.Text;
 
-namespace Wii.Input.Contracts
+namespace Wii.Contracts
 {
     /// <summary>
-    /// Win32 import information for use with the Wii.Input library
+    /// Win32 import information for use with the Wii library
     /// </summary>
     internal class HIDImports
     {

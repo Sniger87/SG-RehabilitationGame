@@ -1,4 +1,4 @@
-﻿namespace Wii.Input.Contracts
+﻿namespace Wii.Contracts
 {
     public enum ControllerType
     {

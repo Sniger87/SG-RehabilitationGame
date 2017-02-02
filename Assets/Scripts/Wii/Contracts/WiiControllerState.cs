@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Wii.Input.Contracts
+namespace Wii.Contracts
 {
     /// <summary>
     /// Current overall state of the WiiController and all attachments

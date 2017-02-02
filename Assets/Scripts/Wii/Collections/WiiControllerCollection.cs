@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
-using Wii.Input.Controllers;
+using Wii.Controllers;
 
-namespace Wii.Input.Collections
+namespace Wii.Collections
 {
     /// <summary>
     /// Used to manage multiple WiiControllers

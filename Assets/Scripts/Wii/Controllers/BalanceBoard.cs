@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
-using Wii.Input.Contracts;
+using Wii.Contracts;
 
-namespace Wii.Input.Controllers
+namespace Wii.Controllers
 {
     public sealed class BalanceBoard : WiiController
     {

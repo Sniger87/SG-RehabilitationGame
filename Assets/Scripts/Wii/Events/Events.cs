@@ -1,9 +1,9 @@
 using System;
-using Wii.Input.Contracts;
+using Wii.Contracts;
 
 //  See http://www.codeplex.com/WiimoteLib
 
-namespace Wii.Input.Events
+namespace Wii.Events
 {
 
 }

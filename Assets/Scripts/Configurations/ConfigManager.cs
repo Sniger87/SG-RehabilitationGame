@@ -10,8 +10,8 @@ namespace Configurations
     public class ConfigManager
     {
         #region Konstanten
-        public const string GameFolderName = "SG_Game";
-        public const string GameConfigFileName = "SG_Game.cfg";
+        public const string GameFolderName = "BeFIT";
+        public const string GameConfigFileName = "BeFIT.cfg";
         #endregion
 
         #region Felder

@@ -48,6 +48,7 @@ public class MainMenu : MonoBehaviour
     public void StartGame()
     {
         LoadImage.SetActive(true);
+        GameInstance.Instance.MenuAudioSource.Stop();
         SceneManager.LoadSceneAsync("Game", LoadSceneMode.Single);
     }
 

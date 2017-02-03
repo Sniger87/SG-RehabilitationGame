@@ -8,7 +8,7 @@ namespace Configurations
     [Serializable]
     public class GameConfig
     {
-        public int VolumeLevel;
+        public float VolumeLevel;
 
         public bool Mute;
 
@@ -16,6 +16,8 @@ namespace Configurations
 
         public GameConfig()
         {
+            this.Mute = false;
+            this.VolumeLevel = 1.0f;
             this.PlayersConfigPath = new List<string>();
         }
     }

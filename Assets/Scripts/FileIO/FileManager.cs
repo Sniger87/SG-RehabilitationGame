@@ -114,7 +114,7 @@ namespace FileIO
             return true;
         }
 
-        public static bool DeleteDirectory(string path)
+        public static bool DeleteDirectory(string path, bool recursive = false)
         {
             if (string.IsNullOrEmpty(path))
             {
@@ -126,7 +126,7 @@ namespace FileIO
                 return false;
             }
 
-            Directory.Delete(path);
+            Directory.Delete(path, recursive);
 
             return true;
         }

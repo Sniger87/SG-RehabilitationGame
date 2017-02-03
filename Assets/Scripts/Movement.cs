@@ -38,7 +38,7 @@ public class Movement : MonoBehaviour
             vertVelo -= gravity * Time.deltaTime;
         }
 
-        if (balanceBoardInstance != null)
+        if (balanceBoardInstance != null && balanceBoardInstance.IsBalanceBoardConnected)
         {
             moveVector.x = balanceBoardInstance.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.BottomRight * Speed;
         }

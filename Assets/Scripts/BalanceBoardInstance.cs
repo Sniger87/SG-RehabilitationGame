@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using Wii.Contracts;
 using Wii.Controllers;
 using Wii.DesktopFacades;
@@ -9,28 +11,41 @@ using Wii.Exceptions;
 public class BalanceBoardInstance : MonoBehaviour
 {
     public BalanceBoard BalanceBoard;
+    public static BalanceBoardInstance Instance;
 
+    public bool IsBalanceBoardConnected
+    {
+        get
+        {
+            if (this.BalanceBoard != null && this.BalanceBoard.IsConnected)
+            {
+                return true;
+            }
+            return false;
+        }
+    }
 
     // Use this for initialization
     void Start()
     {
-        // make BalanceBoardInstance persistent
-        DontDestroyOnLoad(this);
 
-        try
+    }
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
         {
-            this.BalanceBoard = WiiInputManager.Current.FindWiiController(ControllerType.WiiBalanceBoard) as BalanceBoard;
+            DestroyImmediate(gameObject);
+            return;
         }
-        catch (WiiControllerNotFoundException)
-        {
-            // Kein Controller angeschlossen
-        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (this.BalanceBoard != null)
+        if (this.IsBalanceBoardConnected)
         {
             this.BalanceBoard.GetUpdate();
         }
@@ -44,6 +59,25 @@ public class BalanceBoardInstance : MonoBehaviour
             this.BalanceBoard.Disconnect();
             this.BalanceBoard.Dispose();
             this.BalanceBoard = null;
+        }
+    }
+
+    public void Connect()
+    {
+        try
+        {
+            if (this.BalanceBoard == null)
+            {
+                this.BalanceBoard = WiiInputManager.Current.FindWiiController(ControllerType.WiiBalanceBoard) as BalanceBoard;
+            }
+            else
+            {
+                this.BalanceBoard.Connect();
+            }
+        }
+        catch (WiiControllerNotFoundException)
+        {
+            // Kein Controller angeschlossen
         }
     }
 }

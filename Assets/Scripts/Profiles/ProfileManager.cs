@@ -99,6 +99,10 @@ namespace Profiles
 
             ConfigManager.Current.GameConfig.PlayersConfigPath.Add(configFilePath);
 
+            // Save new Player
+            SavePlayers();
+            ConfigManager.Current.SaveGameConfig();
+
             return p;
         }
 
@@ -118,6 +122,13 @@ namespace Profiles
         {
             if (this.Players.Contains(player))
             {
+                FileManager.DeleteDirectory(player.DirectoryPath, true);
+                int index = ConfigManager.Current.GameConfig.PlayersConfigPath.IndexOf(player.ConfigFilePath);
+                if (index >= 0 && index < ConfigManager.Current.GameConfig.PlayersConfigPath.Count)
+                {
+                    ConfigManager.Current.GameConfig.PlayersConfigPath.RemoveAt(index);
+                    ConfigManager.Current.SaveGameConfig();
+                }
                 return this.Players.Remove(player);
             }
             return false;

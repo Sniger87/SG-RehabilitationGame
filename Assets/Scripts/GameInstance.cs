@@ -4,30 +4,54 @@ using System.Linq;
 using Configurations;
 using Profiles;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameInstance : MonoBehaviour
 {
+    public static GameInstance Instance;
+    public AudioSource MenuAudioSource;
+
     // Use this for initialization
     void Start()
     {
-        // make GameInstance persistent
-        DontDestroyOnLoad(this);
-
         // Wichtig! Reigenfolge muss zur initialisierung eingehalten werden
         ConfigManager.Current.LoadGameConfig();
         ProfileManager.Current.LoadPlayers();
 
         // TODO: nachher wieder rausnehmen, nur um Test Profil zu haben
-        Profiles.Player currentPlayer = null;
-        if (!ProfileManager.Current.Players.Any(p => p.Name == "Default"))
+        //if (!ProfileManager.Current.Players.Any(p => p.Name == "Default"))
+        //{
+        //    ProfileManager.Current.CreatePlayer("Default");
+        //}
+        //if (!ProfileManager.Current.Players.Any(p => p.Name == "Tobias"))
+        //{
+        //    ProfileManager.Current.CreatePlayer("Tobias");
+        //}
+
+        ProfileManager.Current.CurrentPlayer = ProfileManager.Current.Players.FirstOrDefault();
+
+        MenuAudioSource = GetComponent<AudioSource>();
+        if (MenuAudioSource.isActiveAndEnabled)
         {
-            currentPlayer = ProfileManager.Current.CreatePlayer("Default");
+            MenuAudioSource.tag = "MenuAudioSource";
+            MenuAudioSource.mute = ConfigManager.Current.GameConfig.Mute;
+            MenuAudioSource.volume = ConfigManager.Current.GameConfig.VolumeLevel;
+            DontDestroyOnLoad(MenuAudioSource);
         }
-        else
+
+        // Show the first scene
+        SceneManager.LoadSceneAsync("Login", LoadSceneMode.Single);
+    }
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
         {
-            currentPlayer = ProfileManager.Current.Players.FirstOrDefault();
+            DestroyImmediate(gameObject);
+            return;
         }
-        ProfileManager.Current.CurrentPlayer = currentPlayer;
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     // Update is called once per frame

@@ -1,18 +1,24 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using Wii.Contracts;
 using Wii.Controllers;
 using Wii.DesktopFacades;
-using Wii.Exceptions;
 using Wii.Events;
-using System.Threading;
+using Wii.Exceptions;
 
 public class BalanceBoardManager
 {
     #region Felder
     private static BalanceBoardManager current;
     private BalanceBoard balanceBoard;
+
+    /// <summary>
+    /// Event raised when BalanceBoard state is changed
+    /// </summary>
+    public event EventHandler<BalanceBoardConnectionChangedEventArgs> BalanceBoardConnectionChanged;
     #endregion
 
     #region Eigenschaften
@@ -59,7 +65,6 @@ public class BalanceBoardManager
     #region Konstruktor
     private BalanceBoardManager()
     {
-
     }
     #endregion
 
@@ -87,9 +92,20 @@ public class BalanceBoardManager
         {
             // Kein Controller angeschlossen
         }
+
+        if (BalanceBoardConnectionChanged != null)
+        {
+            BalanceBoardConnectionChanged(this, new BalanceBoardConnectionChangedEventArgs(this.BalanceBoard));
+        }
     }
 
     public void Disconnect()
+    {
+        Thread t = new Thread(DisconnectAndDestroy);
+        t.Start();
+    }
+
+    public void DisconnectAndDestroy()
     {
         // Wichtig!! Objekt zerstören, damit Zugriff auf Speicher wieder freigegeben wird!!
         if (this.BalanceBoard != null)
@@ -98,6 +114,28 @@ public class BalanceBoardManager
             this.BalanceBoard.Dispose();
             this.BalanceBoard = null;
         }
+
+        if (BalanceBoardConnectionChanged != null)
+        {
+            BalanceBoardConnectionChanged(this, new BalanceBoardConnectionChangedEventArgs(this.BalanceBoard));
+        }
     }
     #endregion
+}
+
+public class BalanceBoardConnectionChangedEventArgs : EventArgs
+{
+    /// <summary>
+    /// The current state of the BalanceBoard
+    /// </summary>
+    public BalanceBoard BalanceBoard;
+
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="balanceBoard">BalanceBoard state</param>
+    public BalanceBoardConnectionChangedEventArgs(BalanceBoard balanceBoard)
+    {
+        this.BalanceBoard = balanceBoard;
+    }
 }

@@ -8,6 +8,8 @@ using UnityEngine.UI;
 public class MainMenu : MonoBehaviour
 {
     public GameObject LoadImage;
+    public GameObject ImageConnected;
+    public GameObject ImageDisconnected;
     public Text PlayerInfo;
     public Text BalanceBoardInfo;
 
@@ -16,11 +18,13 @@ public class MainMenu : MonoBehaviour
     {
         if (BalanceBoardManager.Current.IsBalanceBoardConnected)
         {
-            BalanceBoardInfo.text = "BalanceBoard connected";
+            //BalanceBoardInfo.text = "BalanceBoard connected";
+            ImageConnected.SetActive(true);
         }
         else
         {
-            BalanceBoardInfo.text = "BalanceBoard not connected";
+            //BalanceBoardInfo.text = "BalanceBoard not connected";
+            ImageDisconnected.SetActive(true);
         }
 
         if (ProfileManager.Current.CurrentPlayer != null)

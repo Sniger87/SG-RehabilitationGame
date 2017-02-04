@@ -72,7 +72,8 @@ namespace Wii.Controllers
         // event for status report
         private readonly AutoResetEvent statusDone = new AutoResetEvent(false);
 
-        bool readAsync;
+        private Thread readThread;
+        private bool readAsync;
         #endregion
 
         #region Constructors
@@ -281,8 +282,13 @@ namespace Wii.Controllers
 
                     if (extension)
                     {
-                        BeginAsyncRead();
+                        Thread initializeThread = BeginAsyncRead();
                         Initialize();
+                        if (initializeThread != null)
+                        {
+                            initializeThread.Abort();
+                            initializeThread = null;
+                        }
                     }
 
                     statusDone.Set();
@@ -505,7 +511,7 @@ namespace Wii.Controllers
                         this.HIDDevicePath = devicePath;
 
                         // start reading
-                        BeginAsyncRead();
+                        this.readThread = BeginAsyncRead(10);
 
                         // get calibration infos
                         this.SetCalibrationInfo();
@@ -525,71 +531,82 @@ namespace Wii.Controllers
         /// <summary>
         /// Start reading asynchronously from the controller
         /// </summary>
-        protected void BeginAsyncRead()
+        protected Thread BeginAsyncRead(int threadSleepTime = 0)
         {
             this.readAsync = true;
 
             // Start new Thread for reading
             Thread t = new Thread(OnReadData);
-            t.Start();
+            t.Start(threadSleepTime);
+            return t;
         }
 
         /// <summary>
         /// Reading in another Thread
         /// </summary>
-        private void OnReadData()
+        private void OnReadData(object threadSleepTime)
         {
-            while (readAsync)
+            try
             {
-                byte[] buff = new byte[REPORT_LENGTH];
-
-                uint numberOfBytesRead = 0;
-                NativeOverlapped overlapped = new NativeOverlapped();
-                overlapped.EventHandle = mre.SafeWaitHandle.DangerousGetHandle();
-                overlapped.OffsetHigh = 0;
-                overlapped.OffsetLow = 0;
-
-                if (!HIDImports.ReadFile(this.SafeFileHandle.DangerousGetHandle(), buff, (uint)buff.Length, out numberOfBytesRead, ref overlapped))
+                int sleepTime = (int)threadSleepTime;
+                while (readAsync)
                 {
-                    uint lastError = HIDImports.GetLastError();
-                    if (lastError != HIDImports.ERROR_IO_PENDING)
+                    byte[] buff = new byte[REPORT_LENGTH];
+
+                    uint numberOfBytesRead = 0;
+                    NativeOverlapped overlapped = new NativeOverlapped();
+                    overlapped.EventHandle = mre.SafeWaitHandle.DangerousGetHandle();
+                    overlapped.OffsetHigh = 0;
+                    overlapped.OffsetLow = 0;
+
+                    if (!HIDImports.ReadFile(this.SafeFileHandle.DangerousGetHandle(), buff, (uint)buff.Length, out numberOfBytesRead, ref overlapped))
                     {
-                        Debug.WriteLine("Read Failed: " + lastError.ToString("X"));
-                        continue;
-                    }
-                    else
-                    {
-                        if (!HIDImports.GetOverlappedResult(this.SafeFileHandle.DangerousGetHandle(), ref overlapped, out numberOfBytesRead, true))
+                        uint lastError = HIDImports.GetLastError();
+                        if (lastError != HIDImports.ERROR_IO_PENDING)
                         {
-                            lastError = HIDImports.GetLastError();
                             Debug.WriteLine("Read Failed: " + lastError.ToString("X"));
                             continue;
                         }
-
-                        if (overlapped.InternalHigh.ToInt32() == HIDImports.STATUS_PENDING || overlapped.InternalLow.ToInt32() == HIDImports.STATUS_PENDING)
+                        else
                         {
-                            Debug.WriteLine("Read Interrupted" + lastError.ToString("X"));
-                            if (!HIDImports.CancelIo(this.SafeFileHandle.DangerousGetHandle()))
+                            if (!HIDImports.GetOverlappedResult(this.SafeFileHandle.DangerousGetHandle(), ref overlapped, out numberOfBytesRead, true))
                             {
                                 lastError = HIDImports.GetLastError();
-                                Debug.WriteLine("Cancel IO Failed: " + lastError.ToString("X"));
+                                Debug.WriteLine("Read Failed: " + lastError.ToString("X"));
                                 continue;
+                            }
+
+                            if (overlapped.InternalHigh.ToInt32() == HIDImports.STATUS_PENDING || overlapped.InternalLow.ToInt32() == HIDImports.STATUS_PENDING)
+                            {
+                                Debug.WriteLine("Read Interrupted " + lastError.ToString("X"));
+                                if (!HIDImports.CancelIo(this.SafeFileHandle.DangerousGetHandle()))
+                                {
+                                    lastError = HIDImports.GetLastError();
+                                    Debug.WriteLine("Cancel IO Failed: " + lastError.ToString("X"));
+                                    continue;
+                                }
                             }
                         }
                     }
-                }
 
-                // parse it
-                if (buff != null)
-                {
-                    if (ParseInputReport(buff))
+                    // parse it
+                    if (buff != null)
                     {
-                        if (WiiControllerStateChanged != null)
+                        if (ParseInputReport(buff))
                         {
-                            WiiControllerStateChanged(this, new WiiControllerStateChangedEventArgs(this.WiiControllerState));
+                            if (WiiControllerStateChanged != null)
+                            {
+                                WiiControllerStateChanged(this, new WiiControllerStateChangedEventArgs(this.WiiControllerState));
+                            }
                         }
                     }
+
+                    Thread.Sleep(sleepTime);
                 }
+            }
+            catch (ThreadAbortException ex)
+            {
+                Debug.WriteLine("Thread abort!: " + ex.Message);
             }
         }
         #endregion

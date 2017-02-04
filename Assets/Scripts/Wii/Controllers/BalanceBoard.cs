@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Threading;
 using Wii.Contracts;
 
 namespace Wii.Controllers
@@ -89,7 +90,7 @@ namespace Wii.Controllers
             WriteData(REGISTER_EXTENSION_INIT_2, 0x00);
 
             // start reading again
-            BeginAsyncRead();
+            Thread initThread = BeginAsyncRead();
 
             byte[] buff = ReadData(REGISTER_EXTENSION_TYPE, 6);
             long type = ((long)buff[0] << 40) | ((long)buff[1] << 32) | ((long)buff[2]) << 24 | ((long)buff[3]) << 16 | ((long)buff[4]) << 8 | buff[5];
@@ -117,6 +118,13 @@ namespace Wii.Controllers
 
                 // ReportMode as continous
                 SetDataReportingMode(true);
+            }
+
+            // Thread cancel
+            if (initThread != null)
+            {
+                initThread.Abort();
+                initThread = null;
             }
         }
 

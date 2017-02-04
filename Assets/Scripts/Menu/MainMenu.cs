@@ -14,7 +14,7 @@ public class MainMenu : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        if (BalanceBoardInstance.Instance.IsBalanceBoardConnected)
+        if (BalanceBoardManager.Current.IsBalanceBoardConnected)
         {
             BalanceBoardInfo.text = "BalanceBoard connected";
         }

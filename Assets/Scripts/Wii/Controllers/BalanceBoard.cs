@@ -69,14 +69,6 @@ namespace Wii.Controllers
             {
                 Debug.WriteLine("Write failed: DataReporting");
             }
-            else
-            {
-                // Read
-                if (!ReadReport())
-                {
-                    Debug.WriteLine("Read failed: DataReporting");
-                }
-            }
         }
 
         /// <summary>
@@ -94,16 +86,10 @@ namespace Wii.Controllers
         internal override void Initialize()
         {
             WriteData(REGISTER_EXTENSION_INIT_1, 0x55);
-            if (!ReadReport()) // AcknowledgeOutputReport
-            {
-                Debug.WriteLine("Read failed: init");
-            }
-
             WriteData(REGISTER_EXTENSION_INIT_2, 0x00);
-            if (!ReadReport()) // AcknowledgeOutputReport
-            {
-                Debug.WriteLine("Read failed: init");
-            }
+
+            // start reading again
+            BeginAsyncRead();
 
             byte[] buff = ReadData(REGISTER_EXTENSION_TYPE, 6);
             long type = ((long)buff[0] << 40) | ((long)buff[1] << 32) | ((long)buff[2]) << 24 | ((long)buff[3]) << 16 | ((long)buff[4]) << 8 | buff[5];

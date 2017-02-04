@@ -62,6 +62,8 @@ public class GameInstance : MonoBehaviour
 
     private void OnDestroy()
     {
+        // BalanceBoard unbedingt verwerfen!!
+        BalanceBoardManager.Current.Disconnect();
         // Wichtig! Reigenfolge muss eingehalten werden
         ProfileManager.Current.SavePlayers();
         ConfigManager.Current.SaveGameConfig();

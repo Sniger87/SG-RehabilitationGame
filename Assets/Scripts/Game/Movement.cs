@@ -1,16 +1,10 @@
 ﻿using System.Collections;
 using System.Linq;
 using UnityEngine;
-using Wii.Controllers;
-using Wii.DesktopFacades;
-using Wii.Events;
-using Wii.Exceptions;
-using Wii.Contracts;
 
 public class Movement : MonoBehaviour
 {
     private CharacterController controller;
-    private BalanceBoardInstance balanceBoardInstance;
     private Vector3 moveVector;
 
     //artificial gravity
@@ -22,7 +16,6 @@ public class Movement : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
-        balanceBoardInstance = GetComponent<BalanceBoardInstance>();
     }
 
     // Update is called once per frame
@@ -38,9 +31,9 @@ public class Movement : MonoBehaviour
             vertVelo -= gravity * Time.deltaTime;
         }
 
-        if (balanceBoardInstance != null && balanceBoardInstance.IsBalanceBoardConnected)
+        if (BalanceBoardManager.Current.IsBalanceBoardConnected)
         {
-            moveVector.x = balanceBoardInstance.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.BottomRight * Speed;
+            moveVector.x = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.BottomRight * Speed;
         }
 
         moveVector.x = Input.GetAxisRaw("Horizontal") * Speed;

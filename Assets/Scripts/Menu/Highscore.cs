@@ -20,9 +20,10 @@ public class Highscore : MonoBehaviour
         int maxCount = 10;
 
         List<int> highscores = new List<int>();
-        foreach (Profiles.Player player in ProfileManager.Current.Players)
+
+        if (ProfileManager.Current.CurrentPlayer != null)
         {
-            highscores.AddRange(player.Highscores);
+            highscores.AddRange(ProfileManager.Current.CurrentPlayer.Highscores);
         }
 
         if (!highscores.Any())

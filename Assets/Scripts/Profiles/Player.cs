@@ -22,7 +22,9 @@ namespace Profiles
 
         public List<int> Highscores;
 
-        public List<string> MovementFileNames;
+        public List<string> MovementFilePaths;
+
+        public string CurrentMovementFilePath { get; set; }
         #endregion
 
         #region Konstruktor
@@ -38,7 +40,7 @@ namespace Profiles
             this.DirectoryPath = directoryPath;
             this.ConfigFilePath = configFilePath;
             this.Highscores = new List<int>();
-            this.MovementFileNames = new List<string>();
+            this.MovementFilePaths = new List<string>();
         }
         #endregion
     }

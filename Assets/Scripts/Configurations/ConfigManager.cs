@@ -12,6 +12,7 @@ namespace Configurations
         #region Konstanten
         public const string GameFolderName = "BeFIT";
         public const string GameConfigFileName = "BeFIT.cfg";
+        public const string GameLogFileName = "BeFIT.log";
         #endregion
 
         #region Felder
@@ -21,8 +22,9 @@ namespace Configurations
 
         private string gameConfigPath;
 
-        private GameConfig gameConfig;
+        private string gameLogPath;
 
+        private GameConfig gameConfig;
         #endregion
 
         #region Eigenschaften
@@ -68,6 +70,21 @@ namespace Configurations
             }
         }
 
+        public string GameLogPath
+        {
+            get
+            {
+                return this.gameLogPath;
+            }
+            private set
+            {
+                if (value != this.gameLogPath)
+                {
+                    this.gameLogPath = value;
+                }
+            }
+        }
+
         public GameConfig GameConfig
         {
             get
@@ -90,10 +107,18 @@ namespace Configurations
             string myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             this.GameDirectoryPath = Path.Combine(myDocuments, GameFolderName);
             this.GameConfigPath = Path.Combine(GameDirectoryPath, GameConfigFileName);
+            this.GameLogPath = Path.Combine(GameDirectoryPath, GameLogFileName);
         }
         #endregion
 
         #region Implementierungen
+        public void Initialize()
+        {
+            // Reihenfolge beachten da vorher Directory erstellt wird
+            LoadGameConfig();
+            FileManager.Create(this.GameLogPath, true);
+        }
+
         public void LoadGameConfig()
         {
             if (!Directory.Exists(this.GameDirectoryPath))

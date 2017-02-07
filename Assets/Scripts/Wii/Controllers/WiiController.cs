@@ -63,6 +63,7 @@ namespace Wii.Controllers
 
         // store if WiiController is connected
         private bool isConnected;
+        private bool isInitialized;
 
         // event for read data processing
         private readonly ManualResetEvent mre = new ManualResetEvent(false);
@@ -156,6 +157,24 @@ namespace Wii.Controllers
                 }
             }
         }
+
+        /// <summary>
+        /// Returns if WiiController is initialized
+        /// </summary>
+        public bool IsInitialized
+        {
+            get
+            {
+                return this.isInitialized;
+            }
+            protected set
+            {
+                if (value != this.isInitialized)
+                {
+                    this.isInitialized = value;
+                }
+            }
+        }
         #endregion
 
         #region Implements
@@ -214,7 +233,7 @@ namespace Wii.Controllers
             // Write
             if (!WriteReport())
             {
-                Debug.WriteLine("Write failed: set led");
+                Log("Write failed: set led");
             }
         }
 
@@ -236,13 +255,13 @@ namespace Wii.Controllers
             // Write
             if (!WriteReport())
             {
-                Debug.WriteLine("Write failed: get status");
+                Log("Write failed: get status");
             }
 
             // signal the status report finished
             if (!statusDone.WaitOne(3000, false))
             {
-                Debug.WriteLine("Timed out waiting for status report");
+                Log("Timed out waiting for status report");
             }
         }
 
@@ -254,7 +273,7 @@ namespace Wii.Controllers
         private bool ParseInputReport(byte[] buff)
         {
             InputReport type = (InputReport)buff[0];
-            Debug.WriteLine(type);
+            Log(type.ToString());
             switch (type)
             {
                 case InputReport.CoreButtons:
@@ -278,11 +297,13 @@ namespace Wii.Controllers
                     // extension connected?
                     // BalanceBoard is a extension too
                     bool extension = (buff[3] & 0x02) != 0;
-                    Debug.WriteLine("Extension: " + extension);
+                    Log("Extension: " + extension.ToString());
 
                     if (extension)
                     {
                         Thread initializeThread = BeginAsyncRead();
+                        Thread.Sleep(100);
+
                         Initialize();
                         if (initializeThread != null)
                         {
@@ -298,11 +319,11 @@ namespace Wii.Controllers
                     ParseReadData(buff);
                     break;
                 case InputReport.AcknowledgeOutputReport:
-                    Debug.WriteLine("ack: " + buff[0] + " " + buff[1] + " " + buff[2] + " " + buff[3] + " " + buff[4]);
+                    Log("ack: " + buff[0].ToString() + " " + buff[1].ToString() + " " + buff[2].ToString() + " " + buff[3].ToString() + " " + buff[4].ToString());
                     writeDone.Set();
                     break;
                 default:
-                    Debug.WriteLine("Unknown report type: " + type.ToString("x"));
+                    Log("Unknown report type: " + type.ToString("x"));
                     return false;
             }
 
@@ -377,16 +398,18 @@ namespace Wii.Controllers
         /// </summary>
         internal bool WriteReport()
         {
-            Debug.WriteLine("WriteReport: " + buff[0].ToString("x"));
+            Log("WriteReport: " + buff[0].ToString("x"));
 
             bool result = HIDImports.HidD_SetOutputReport(this.SafeFileHandle.DangerousGetHandle(), buff, (uint)buff.Length);
 
+            Log("WriteReport: " + result.ToString());
+
             if (this.buff[0] == (byte)OutputReport.WriteMemory)
             {
-                Debug.WriteLine("Wait");
+                Log("Wait");
                 if (!writeDone.WaitOne(1000, false))
                 {
-                    Debug.WriteLine("Wait failed");
+                    Log("Wait failed");
                 }
             }
 
@@ -419,12 +442,12 @@ namespace Wii.Controllers
             // Write
             if (!WriteReport())
             {
-                Debug.WriteLine("Write failed: ReadData");
+                Log("Write failed: ReadData");
             }
 
             if (!readDone.WaitOne(1000, false))
             {
-                Debug.WriteLine("Error reading data from Wiimote...is it connected?");
+                Log("Error reading data from Wiimote, is it connected?");
             }
 
             return readBuff;
@@ -461,7 +484,7 @@ namespace Wii.Controllers
 
             if (!WriteReport())
             {
-                Debug.WriteLine("Write failed: WriteData");
+                Log("Write failed: WriteData");
             }
         }
 
@@ -511,7 +534,8 @@ namespace Wii.Controllers
                         this.HIDDevicePath = devicePath;
 
                         // start reading
-                        this.readThread = BeginAsyncRead(10);
+                        this.readThread = BeginAsyncRead();
+                        Thread.Sleep(100);
 
                         // get calibration infos
                         this.SetCalibrationInfo();
@@ -523,6 +547,14 @@ namespace Wii.Controllers
 
                         // set LED
                         this.SetLEDs(true, true, true, true);
+
+                        if (this.readThread != null)
+                        {
+                            this.readThread.Abort();
+                            this.readThread = null;
+                        }
+
+                        this.readAsync = false;
                     }
                 }
             }
@@ -535,8 +567,11 @@ namespace Wii.Controllers
         {
             this.readAsync = true;
 
+            Log("Read Thread starting");
+
             // Start new Thread for reading
             Thread t = new Thread(OnReadData);
+            Log("Thread: " + (t != null).ToString());
             t.Start(threadSleepTime);
             return t;
         }
@@ -546,6 +581,8 @@ namespace Wii.Controllers
         /// </summary>
         private void OnReadData(object threadSleepTime)
         {
+            Log("Read Thread started");
+
             try
             {
                 int sleepTime = (int)threadSleepTime;
@@ -559,12 +596,16 @@ namespace Wii.Controllers
                     overlapped.OffsetHigh = 0;
                     overlapped.OffsetLow = 0;
 
-                    if (!HIDImports.ReadFile(this.SafeFileHandle.DangerousGetHandle(), buff, (uint)buff.Length, out numberOfBytesRead, ref overlapped))
+                    bool result = HIDImports.ReadFile(this.SafeFileHandle.DangerousGetHandle(), buff, (uint)buff.Length, out numberOfBytesRead, ref overlapped);
+
+                    Log("ReadReport: " + result.ToString());
+
+                    if (!result)
                     {
                         uint lastError = HIDImports.GetLastError();
                         if (lastError != HIDImports.ERROR_IO_PENDING)
                         {
-                            Debug.WriteLine("Read Failed: " + lastError.ToString("X"));
+                            Log("Read failed: " + lastError.ToString("X"));
                             continue;
                         }
                         else
@@ -572,17 +613,17 @@ namespace Wii.Controllers
                             if (!HIDImports.GetOverlappedResult(this.SafeFileHandle.DangerousGetHandle(), ref overlapped, out numberOfBytesRead, true))
                             {
                                 lastError = HIDImports.GetLastError();
-                                Debug.WriteLine("Read Failed: " + lastError.ToString("X"));
+                                Log("Read failed: " + lastError.ToString("X"));
                                 continue;
                             }
 
                             if (overlapped.InternalHigh.ToInt32() == HIDImports.STATUS_PENDING || overlapped.InternalLow.ToInt32() == HIDImports.STATUS_PENDING)
                             {
-                                Debug.WriteLine("Read Interrupted " + lastError.ToString("X"));
+                                Log("Read interrupted " + lastError.ToString("X"));
                                 if (!HIDImports.CancelIo(this.SafeFileHandle.DangerousGetHandle()))
                                 {
                                     lastError = HIDImports.GetLastError();
-                                    Debug.WriteLine("Cancel IO Failed: " + lastError.ToString("X"));
+                                    Log("CancelIO failed: " + lastError.ToString("X"));
                                     continue;
                                 }
                             }
@@ -606,8 +647,49 @@ namespace Wii.Controllers
             }
             catch (ThreadAbortException ex)
             {
-                Debug.WriteLine("Thread abort!: " + ex.Message);
+                Log("Thread abort!: " + ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Reading
+        /// </summary>
+        private void ReadReport()
+        {
+            byte[] buff = new byte[REPORT_LENGTH];
+
+            uint numberOfBytesRead = 0;
+            NativeOverlapped overlapped = new NativeOverlapped();
+            overlapped.EventHandle = mre.SafeWaitHandle.DangerousGetHandle();
+            overlapped.OffsetHigh = 0;
+            overlapped.OffsetLow = 0;
+
+            bool result = HIDImports.ReadFile(this.SafeFileHandle.DangerousGetHandle(), buff, (uint)buff.Length, out numberOfBytesRead, ref overlapped);
+
+            Log("ReadReport: " + result.ToString());
+
+            // parse it
+            if (buff != null && result)
+            {
+                if (ParseInputReport(buff))
+                {
+                    if (WiiControllerStateChanged != null)
+                    {
+                        WiiControllerStateChanged(this, new WiiControllerStateChangedEventArgs(this.WiiControllerState));
+                    }
+                }
+            }
+        }
+
+        public void GetUpdate()
+        {
+            ReadReport();
+        }
+
+        protected void Log(string content)
+        {
+            string path = Configurations.ConfigManager.Current.GameLogPath;
+            FileIO.FileManager.AppendLog(path, content);
         }
         #endregion
 
@@ -619,6 +701,7 @@ namespace Wii.Controllers
         {
             this.readAsync = false;
             this.IsConnected = false;
+            this.IsInitialized = false;
             Dispose(true);
             GC.SuppressFinalize(this);
         }

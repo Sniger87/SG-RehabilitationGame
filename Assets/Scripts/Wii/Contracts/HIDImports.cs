@@ -100,6 +100,12 @@ namespace Wii.Contracts
             byte[] lpReportBuffer,
             uint ReportBufferLength);
 
+        [DllImport("hid.dll")]
+        public extern static bool HidD_GetInputReport(
+            IntPtr HidDeviceObject,
+            out byte[] lpReportBuffer,
+            uint ReportBufferLength);
+
         [DllImport("hid.dll", SetLastError = true)]
         public static extern bool HidD_GetProductString(
             IntPtr HidDeviceObject,
@@ -185,5 +191,22 @@ namespace Wii.Contracts
         [DllImport("kernel32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool CancelIo(IntPtr hFile);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool ReadFile(
+            IntPtr hFile,
+            [Out] byte[] lpBuffer,
+            uint nNumberOfBytesToRead,
+            out uint lpNumberOfBytesRead,
+            IntPtr lpOverlapped);
+
+        [DllImport("kernel32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool WriteFile(
+            IntPtr hFile,
+            byte[] lpBuffer,
+            uint nNumberOfBytesToWrite,
+            out uint lpNumberOfBytesWritten,
+            [In] ref System.Threading.NativeOverlapped lpOverlapped);
     }
 }

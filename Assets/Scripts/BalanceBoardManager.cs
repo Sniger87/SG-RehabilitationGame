@@ -53,7 +53,7 @@ public class BalanceBoardManager
     {
         get
         {
-            if (this.BalanceBoard != null && this.BalanceBoard.IsConnected)
+            if (this.BalanceBoard != null && this.BalanceBoard.IsConnected && this.BalanceBoard.IsInitialized)
             {
                 return true;
             }
@@ -99,20 +99,25 @@ public class BalanceBoardManager
         }
     }
 
-    public void Disconnect()
+    public void Disconnect(bool destroy = false)
     {
         Thread t = new Thread(DisconnectAndDestroy);
-        t.Start();
+        t.Start(destroy);
     }
 
-    public void DisconnectAndDestroy()
+    public void DisconnectAndDestroy(object value)
     {
+        bool destroy = (bool)value;
+
         // Wichtig!! Objekt zerstören, damit Zugriff auf Speicher wieder freigegeben wird!!
         if (this.BalanceBoard != null)
         {
             this.BalanceBoard.Disconnect();
-            this.BalanceBoard.Dispose();
-            this.BalanceBoard = null;
+            if (destroy)
+            {
+                this.BalanceBoard.Dispose();
+                this.BalanceBoard = null;
+            }
         }
 
         if (BalanceBoardConnectionChanged != null)

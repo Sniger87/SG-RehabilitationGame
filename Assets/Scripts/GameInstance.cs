@@ -15,18 +15,8 @@ public class GameInstance : MonoBehaviour
     void Start()
     {
         // Wichtig! Reigenfolge muss zur initialisierung eingehalten werden
-        ConfigManager.Current.LoadGameConfig();
+        ConfigManager.Current.Initialize();
         ProfileManager.Current.LoadPlayers();
-
-        // TODO: nachher wieder rausnehmen, nur um Test Profil zu haben
-        //if (!ProfileManager.Current.Players.Any(p => p.Name == "Default"))
-        //{
-        //    ProfileManager.Current.CreatePlayer("Default");
-        //}
-        //if (!ProfileManager.Current.Players.Any(p => p.Name == "Tobias"))
-        //{
-        //    ProfileManager.Current.CreatePlayer("Tobias");
-        //}
 
         ProfileManager.Current.CurrentPlayer = ProfileManager.Current.Players.FirstOrDefault();
 
@@ -63,7 +53,7 @@ public class GameInstance : MonoBehaviour
     private void OnDestroy()
     {
         // BalanceBoard unbedingt verwerfen!!
-        BalanceBoardManager.Current.Disconnect();
+        BalanceBoardManager.Current.Disconnect(destroy: true);
         // Wichtig! Reigenfolge muss eingehalten werden
         ProfileManager.Current.SavePlayers();
         ConfigManager.Current.SaveGameConfig();

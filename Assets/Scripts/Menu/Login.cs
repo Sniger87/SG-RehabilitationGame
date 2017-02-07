@@ -10,6 +10,8 @@ public class Login : MonoBehaviour
 {
     public Dropdown DropDownPlayers;
     public GameObject LoadImage;
+    public Button ButtonSelect;
+    public Button ButtonDelete;
 
     // Use this for initialization
     void Start()
@@ -34,6 +36,14 @@ public class Login : MonoBehaviour
             }
 
             ProfileManager.Current.CurrentPlayer = null;
+
+            ButtonSelect.interactable = false;
+            ButtonDelete.interactable = false;
+        }
+        else
+        {
+            ButtonSelect.interactable = true;
+            ButtonDelete.interactable = true;
         }
     }
 

@@ -134,14 +134,25 @@ namespace Profiles
             return false;
         }
 
-        public void CreateFileAtCurrentPlayer()
+        public void CreateMovementFileAtCurrentPlayer()
         {
-
+            if (this.CurrentPlayer != null)
+            {
+                string fileName = string.Format("Movement_{0}.csv}", this.CurrentPlayer.MovementFilePaths.Count);
+                string filePath = Path.Combine(this.CurrentPlayer.DirectoryPath, fileName);
+                if (FileManager.Create(filePath))
+                {
+                    this.CurrentPlayer.CurrentMovementFilePath = filePath;
+                }
+            }
         }
 
-        public void WriteFileAtCurrentPlayer()
+        public void WriteMovementFileAtCurrentPlayer(string content)
         {
-
+            if (this.CurrentPlayer != null && !string.IsNullOrEmpty(this.CurrentPlayer.CurrentMovementFilePath))
+            {
+                FileManager.Append(this.CurrentPlayer.CurrentMovementFilePath, content);
+            }
         }
 
         public void SavePlayers()

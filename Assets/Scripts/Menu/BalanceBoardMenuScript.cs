@@ -12,6 +12,8 @@ public class BalanceBoardMenuScript : MonoBehaviour
     public GameObject LoadImage;
     public GameObject ConnectingImage;
     public GameObject DisconnectingImage;
+    public GameObject BalanceBoardConnectedImage;
+    public GameObject BalanceBoardDisconnectedImage;
     public Text InfoText;
     public Button ConnectButton;
     public Button DisconnectButton;
@@ -25,15 +27,11 @@ public class BalanceBoardMenuScript : MonoBehaviour
 
         if (BalanceBoardManager.Current.IsBalanceBoardConnected)
         {
-            ConnectButton.interactable = false;
-            DisconnectButton.interactable = true;
-            InfoText.text = "connect";
+            SetConnectedState();
         }
         else
         {
-            ConnectButton.interactable = true;
-            DisconnectButton.interactable = false;
-            InfoText.text = "disconnect";
+            SetDisconnectedState();
         }
     }
 
@@ -49,26 +47,41 @@ public class BalanceBoardMenuScript : MonoBehaviour
 
         if (balanceBoard == null)
         {
-            ConnectButton.interactable = true;
-            DisconnectButton.interactable = false;
+            SetDisconnectedState();
             InfoText.text = "not found";
         }
         else
         {
-            if (balanceBoard.IsConnected)
+            if (balanceBoard.IsConnected && balanceBoard.IsInitialized)
             {
-                ConnectButton.interactable = false;
-                DisconnectButton.interactable = true;
-                InfoText.text = "connect";
+                SetConnectedState();
             }
             else
             {
-                ConnectButton.interactable = true;
-                DisconnectButton.interactable = false;
-                InfoText.text = "disconnect";
+                SetDisconnectedState();
+                // Lieber wieder Verbindung trennen wenn initialisierung nicht erfolgreich war
+                balanceBoard.Disconnect();
             }
         }
         this.updateBalanceBoardState = false;
+    }
+
+    private void SetDisconnectedState()
+    {
+        ConnectButton.interactable = true;
+        DisconnectButton.interactable = false;
+        InfoText.text = "disconnect";
+        BalanceBoardConnectedImage.SetActive(false);
+        BalanceBoardDisconnectedImage.SetActive(true);
+    }
+
+    private void SetConnectedState()
+    {
+        ConnectButton.interactable = false;
+        DisconnectButton.interactable = true;
+        InfoText.text = "connect";
+        BalanceBoardConnectedImage.SetActive(true);
+        BalanceBoardDisconnectedImage.SetActive(false);
     }
 
     // Update is called once per frame

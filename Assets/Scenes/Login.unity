@@ -727,6 +727,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DropDownPlayers: {fileID: 658796263}
   LoadImage: {fileID: 27241556}
+  ButtonSelect: {fileID: 215391342}
+  ButtonDelete: {fileID: 108741677}
 --- !u!114 &243954102
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -33,6 +33,7 @@ public class Movement : MonoBehaviour
 
         if (BalanceBoardManager.Current.IsBalanceBoardConnected)
         {
+            //BalanceBoardManager.Current.BalanceBoard.GetUpdate();
             moveVector.x = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.BottomRight * Speed;
         }
 

@@ -68,7 +68,7 @@ namespace Wii.Controllers
             // Write
             if (!WriteReport())
             {
-                Debug.WriteLine("Write failed: DataReporting");
+                Log("Write failed: DataReporting");
             }
         }
 
@@ -89,13 +89,13 @@ namespace Wii.Controllers
             WriteData(REGISTER_EXTENSION_INIT_1, 0x55);
             WriteData(REGISTER_EXTENSION_INIT_2, 0x00);
 
-            // start reading again
             Thread initThread = BeginAsyncRead();
+            Thread.Sleep(100);
 
             byte[] buff = ReadData(REGISTER_EXTENSION_TYPE, 6);
             long type = ((long)buff[0] << 40) | ((long)buff[1] << 32) | ((long)buff[2]) << 24 | ((long)buff[3]) << 16 | ((long)buff[4]) << 8 | buff[5];
 
-            Debug.WriteLine("BalanceBoradType: " + (type == BalanceBoardType));
+            Log("BalanceBoradType: " + (type == BalanceBoardType).ToString());
 
             if (type == BalanceBoardType)
             {
@@ -118,6 +118,8 @@ namespace Wii.Controllers
 
                 // ReportMode as continous
                 SetDataReportingMode(true);
+
+                this.IsInitialized = true;
             }
 
             // Thread cancel

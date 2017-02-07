@@ -62,7 +62,7 @@ namespace FileIO
             File.AppendAllText(path, contents);
         }
 
-        public static bool Create(string path)
+        public static bool Create(string path, bool overwrite = false)
         {
             if (string.IsNullOrEmpty(path))
             {
@@ -71,7 +71,14 @@ namespace FileIO
 
             if (File.Exists(path))
             {
-                return false;
+                if (overwrite)
+                {
+                    Delete(path);
+                }
+                else
+                {
+                    return false;
+                }
             }
 
             FileStream fs = File.Create(path);
@@ -129,6 +136,14 @@ namespace FileIO
             Directory.Delete(path, recursive);
 
             return true;
+        }
+
+        public static void AppendLog(string logPath, string content)
+        {
+            // create if not exists
+            Create(logPath);
+            // append content to log
+            Append(logPath, content + Environment.NewLine);
         }
         #endregion
     }

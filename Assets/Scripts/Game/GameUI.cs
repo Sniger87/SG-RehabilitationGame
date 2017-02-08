@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class GameUI : MonoBehaviour
 {
-    public GameObject FinishPanel;
     public GameObject PausePanel;
 
     // Use this for initialization

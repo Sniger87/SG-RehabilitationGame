@@ -14,7 +14,7 @@ public class SpawnManager : MonoBehaviour {
 
 	private float spawnAxisZ = -5.0f;
 	//amount of prefabs per area
-	private int amntPrefabs = 10;
+	private int amntPrefabs = 7;
 	private float prefabLength = 25.0f;
 	//number of prefabs visible
 	private int preRenders = 7;
@@ -23,7 +23,7 @@ public class SpawnManager : MonoBehaviour {
 	//ID of last used prefab
 	private int prefabID = 2;
 	//number of coins
-	private int amntCoins = 5;
+	private int amntCoins = 1;
 
 	// Use this for initialization
 	void Start () {
@@ -81,16 +81,16 @@ public class SpawnManager : MonoBehaviour {
 		borders.transform.position = Vector3.forward * spawnAxisZ;
 
 		//spawn coin
-		if (amntCoins > 0) {
+		if (amntCoins > 0 && prefabIndex == -1) {
 			//randomly add a coin
 			int flipcoin = Random.Range (0, 2);
 
 			if (((amntPrefabs > amntCoins) && (flipcoin == 1)) || (amntPrefabs <= amntCoins)) {
 
-				Vector3 coinPosition = new Vector3 (Random.Range (-4, 4), 0.6f, spawnAxisZ + Random.Range (1, 22));
+				Vector3 coinPosition = new Vector3 (Random.Range (-4, 4), 0.8f, spawnAxisZ + Random.Range (1, 22));
 				//determine random position
 				while((Physics.OverlapSphere (coinPosition, 0.6f)).Length != 0) {
-					coinPosition = new Vector3 (Random.Range (-4, 4), 0.6f, spawnAxisZ + Random.Range (1, 22));				
+					coinPosition = new Vector3 (Random.Range (-4, 4), 0.8f, spawnAxisZ + Random.Range (1, 22));				
 					//Debug.Log ("Overlap");
 				}
 				//Debug.Log ("No overlap occurred at tile " + amntPrefabs.ToString ());

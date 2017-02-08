@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Collision : MonoBehaviour {
 
 	public Text counter;
 	public Text collisions;
 	public Text finish;
+	public Text countdown;
+
+	public GameObject FinishPanel;
 
 	public AudioClip coinAudioFX;
 	public AudioClip obstacleAudioFX;
@@ -43,10 +47,14 @@ public class Collision : MonoBehaviour {
 		}
 
 		if (col.gameObject.tag == "Finish") {
-			Debug.Log ("Finished~");
-			//finish.text = "Fertig!  " + "Eingesammelte Münzen: " + coinsCollected.ToString ();
-			//finish.enabled = true;
-			//start transition sequence & load new level
+			finish.text = "Geschafft! \n\n";
+			finish.text += "Eingesammelte Münzen:  " + coinsCollected.ToString () + "\n";
+			finish.text += "Highscore, Zeit, etc...";
+			FinishPanel.SetActive(true);
+			//wait 5 seconds
+			StartCoroutine(Wait());
+
+
 		}
 	}
 
@@ -61,5 +69,15 @@ public class Collision : MonoBehaviour {
 	void VisualizeFX (AudioClip clip) {
 		//sourceVisual. = clip;
 		//sourceVisual.Play;
+	}
+
+	private IEnumerator Wait() {
+		int t = 5;
+		while (t > 0) {
+			countdown.text = t.ToString();
+			yield return new WaitForSeconds (1.5f);
+			t--;
+		}
+		SceneManager.LoadSceneAsync("Game", LoadSceneMode.Single);
 	}
 }

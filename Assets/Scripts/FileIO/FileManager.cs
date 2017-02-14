@@ -3,148 +3,146 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
-namespace FileIO
-{
-    public static class FileManager
-    {
-        #region Felder
-        #endregion
+namespace FileIO {
+	public static class FileManager {
+		#region Felder
 
-        #region Eigenschaften
-        #endregion
+		#endregion
 
-        #region Konstruktor
-        #endregion
+		#region Eigenschaften
 
-        #region Implementierungen
-        public static string Read(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-            {
-                throw new ArgumentNullException(path, "Pfad der Datei darf nicht leer sein.");
-            }
+		#endregion
 
-            if (!File.Exists(path))
-            {
-                throw new FileNotFoundException("Datei wurde nicht gefunden.");
-            }
+		#region Konstruktor
 
-            return File.ReadAllText(path);
-        }
+		#endregion
 
-        public static void Write(string path, string contents)
-        {
-            if (string.IsNullOrEmpty(path))
-            {
-                throw new ArgumentNullException(path, "Pfad der Datei darf nicht leer sein.");
-            }
+		#region Implementierungen
 
-            if (!File.Exists(path))
-            {
-                throw new FileNotFoundException("Datei wurde nicht gefunden.");
-            }
+		public static string Read (string path) {
+			if (string.IsNullOrEmpty (path)) {
+				throw new ArgumentNullException (path, "Pfad der Datei darf nicht leer sein.");
+			}
 
-            File.WriteAllText(path, contents);
-        }
+			if (!File.Exists (path)) {
+				throw new FileNotFoundException ("Datei wurde nicht gefunden.");
+			}
 
-        public static void Append(string path, string contents)
-        {
-            if (string.IsNullOrEmpty(path))
-            {
-                throw new ArgumentNullException(path, "Pfad der Datei darf nicht leer sein.");
-            }
+			return File.ReadAllText (path);
+		}
 
-            if (!File.Exists(path))
-            {
-                throw new FileNotFoundException("Datei wurde nicht gefunden.");
-            }
+		public static void Write (string path, string contents) {
+			if (string.IsNullOrEmpty (path)) {
+				throw new ArgumentNullException (path, "Pfad der Datei darf nicht leer sein.");
+			}
 
-            File.AppendAllText(path, contents);
-        }
+			if (!File.Exists (path)) {
+				throw new FileNotFoundException ("Datei wurde nicht gefunden.");
+			}
 
-        public static bool Create(string path, bool overwrite = false)
-        {
-            if (string.IsNullOrEmpty(path))
-            {
-                throw new ArgumentNullException(path, "Pfad der Datei darf nicht leer sein.");
-            }
+			File.WriteAllText (path, contents);
+		}
 
-            if (File.Exists(path))
-            {
-                if (overwrite)
-                {
-                    Delete(path);
-                }
-                else
-                {
-                    return false;
-                }
-            }
+		public static void Append (string path, string contents) {
+			if (string.IsNullOrEmpty (path)) {
+				throw new ArgumentNullException (path, "Pfad der Datei darf nicht leer sein.");
+			}
 
-            FileStream fs = File.Create(path);
-            fs.Close();
+			if (!File.Exists (path)) {
+				throw new FileNotFoundException ("Datei wurde nicht gefunden.");
+			}
 
-            return true;
-        }
+			File.AppendAllText (path, contents);
+		}
 
-        public static bool Delete(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-            {
-                throw new ArgumentNullException(path, "Pfad der Datei darf nicht leer sein.");
-            }
+		public static bool Create (string path, bool overwrite = false) {
+			if (string.IsNullOrEmpty (path)) {
+				throw new ArgumentNullException (path, "Pfad der Datei darf nicht leer sein.");
+			}
 
-            if (!File.Exists(path))
-            {
-                return false;
-            }
+			if (File.Exists (path)) {
+				if (overwrite) {
+					Delete (path);
+				} else {
+					return false;
+				}
+			}
 
-            File.Delete(path);
+			FileStream fs = File.Create (path);
+			fs.Close ();
 
-            return true;
-        }
+			return true;
+		}
 
-        public static bool CreateDirectory(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-            {
-                throw new ArgumentNullException(path, "Pfad des Ordners darf nicht leer sein.");
-            }
+		public static bool Delete (string path) {
+			if (string.IsNullOrEmpty (path)) {
+				throw new ArgumentNullException (path, "Pfad der Datei darf nicht leer sein.");
+			}
 
-            if (Directory.Exists(path))
-            {
-                return false;
-            }
+			if (!File.Exists (path)) {
+				return false;
+			}
 
-            Directory.CreateDirectory(path);
+			File.Delete (path);
 
-            return true;
-        }
+			return true;
+		}
 
-        public static bool DeleteDirectory(string path, bool recursive = false)
-        {
-            if (string.IsNullOrEmpty(path))
-            {
-                throw new ArgumentNullException(path, "Pfad des Ordners darf nicht leer sein.");
-            }
+		public static bool CreateDirectory (string path) {
+			if (string.IsNullOrEmpty (path)) {
+				throw new ArgumentNullException (path, "Pfad des Ordners darf nicht leer sein.");
+			}
 
-            if (!Directory.Exists(path))
-            {
-                return false;
-            }
+			if (Directory.Exists (path)) {
+				return false;
+			}
 
-            Directory.Delete(path, recursive);
+			Directory.CreateDirectory (path);
 
-            return true;
-        }
+			return true;
+		}
 
-        public static void AppendLog(string logPath, string content)
-        {
-            // create if not exists
-            Create(logPath);
-            // append content to log
-            Append(logPath, content + Environment.NewLine);
-        }
-        #endregion
-    }
+		public static bool DeleteDirectory (string path, bool recursive = false) {
+			if (string.IsNullOrEmpty (path)) {
+				throw new ArgumentNullException (path, "Pfad des Ordners darf nicht leer sein.");
+			}
+
+			if (!Directory.Exists (path)) {
+				return false;
+			}
+
+			Directory.Delete (path, recursive);
+
+			return true;
+		}
+
+		public static void AppendLog (string logPath, string content) {
+			// create if not exists
+			Create (logPath);
+			// append content to log
+			Append (logPath, content + Environment.NewLine);
+		}
+
+		public static void AppendPlayerLog (string content) {
+			//TODO implement function
+			AppendLog ("", content);
+		}
+
+		public static void WritePlayerLog (string content) {
+			//TODO implement function
+			AppendLog ("", content);
+		}
+
+		public static void WriteLevelLog (string content) {
+			//TODO implement function
+			AppendLog ("", content);
+		}
+
+		public static void AppendLevelLog (string content) {
+			//TODO implement function
+			AppendLog ("", content);
+		}
+
+		#endregion
+	}
 }

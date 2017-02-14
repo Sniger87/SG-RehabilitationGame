@@ -2,46 +2,39 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Profiles
-{
-    [Serializable]
-    public class Player
-    {
-        #region Eigenschaften
-        public int Id;
+namespace Profiles {
+	[Serializable]
+	public class Player {
+		#region Eigenschaften
 
-        public int Coins;
+		public int Id;
+		public int Coins;
+		public int Collisions;
+		public int Level;
+		public string Name;
+		public string DirectoryPath;
+		public string ConfigFilePath;
+		public List<int> Highscores;
+		public List<string> MovementFilePaths;
+		public string CurrentMovementFilePath { get; set; }
 
-        public int Collisions;
+		#endregion
 
-        public string Name;
+		#region Konstruktor
 
-        public string DirectoryPath;
+		public Player() {
 
-        public string ConfigFilePath;
+		}
 
-        public List<int> Highscores;
+		public Player(int id, string name, string directoryPath, string configFilePath) {
+			this.Id = id;
+			this.Name = name;
+			this.DirectoryPath = directoryPath;
+			this.ConfigFilePath = configFilePath;
+			this.Highscores = new List<int>();
+			this.MovementFilePaths = new List<string>();
+		}
 
-        public List<string> MovementFilePaths;
-
-        public string CurrentMovementFilePath { get; set; }
-        #endregion
-
-        #region Konstruktor
-        public Player()
-        {
-
-        }
-
-        public Player(int id, string name, string directoryPath, string configFilePath)
-        {
-            this.Id = id;
-            this.Name = name;
-            this.DirectoryPath = directoryPath;
-            this.ConfigFilePath = configFilePath;
-            this.Highscores = new List<int>();
-            this.MovementFilePaths = new List<string>();
-        }
-        #endregion
-    }
+		#endregion
+	}
 }

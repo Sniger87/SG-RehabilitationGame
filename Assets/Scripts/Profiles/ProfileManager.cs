@@ -7,162 +7,144 @@ using Configurations;
 using FileIO;
 using UnityEngine;
 
-namespace Profiles
-{
-    public class ProfileManager
-    {
-        #region Konstanten
-        private const string PlayerFolderPrefix = "Player";
-        #endregion
+namespace Profiles {
+	public class ProfileManager {
+		#region Konstanten
 
-        #region Felder
-        private static ProfileManager current;
+		private const string PlayerFolderPrefix = "Player";
 
-        private List<Player> players;
-        private Player currentPlayer;
-        #endregion
+		#endregion
 
-        #region Eigenschaften
-        public static ProfileManager Current
-        {
-            get
-            {
-                if (current == null)
-                {
-                    current = new ProfileManager();
-                }
-                return current;
-            }
-        }
+		#region Felder
 
-        public List<Player> Players
-        {
-            get
-            {
-                return players;
-            }
-            set
-            {
-                if (value != players)
-                {
-                    players = value;
-                }
-            }
-        }
+		private static ProfileManager current;
 
-        public Player CurrentPlayer
-        {
-            get
-            {
-                return currentPlayer;
-            }
-            set
-            {
-                if (value != currentPlayer)
-                {
-                    currentPlayer = value;
-                }
-            }
-        }
-        #endregion
+		private List<Player> players;
+		private Player currentPlayer;
 
-        #region Konstruktor
-        private ProfileManager()
-        {
-            this.Players = new List<Player>();
-        }
-        #endregion
+		#endregion
 
-        #region Implementierungen
-        public Player CreatePlayer(string name)
-        {
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentNullException(name, "Name des Spielers darf nicht leer sein.");
-            }
+		#region Eigenschaften
 
-            int playerId = this.Players.Count;
-            string playerFolderName = string.Format("{0}_{1}", PlayerFolderPrefix, playerId);
+		public static ProfileManager Current {
+			get {
+				if (current == null) {
+					current = new ProfileManager();
+				}
+				return current;
+			}
+		}
 
-            string directoryPath = Path.Combine(ConfigManager.Current.GameDirectoryPath, playerFolderName);
+		public List<Player> Players {
+			get {
+				return players;
+			}
+			set {
+				if (value != players) {
+					players = value;
+				}
+			}
+		}
 
-            FileManager.CreateDirectory(directoryPath);
+		public Player CurrentPlayer {
+			get {
+				return currentPlayer;
+			}
+			set {
+				if (value != currentPlayer) {
+					currentPlayer = value;
+				}
+			}
+		}
 
-            string playerConfigName = string.Format("{0}_{1}.cfg", PlayerFolderPrefix, playerId);
-            string configFilePath = Path.Combine(directoryPath, playerConfigName);
+		#endregion
 
-            FileManager.Create(configFilePath);
+		#region Konstruktor
 
-            Player p = new Player(playerId, name, directoryPath, configFilePath);
+		private ProfileManager() {
+			this.Players = new List<Player>();
+		}
 
-            this.Players.Add(p);
+		#endregion
 
-            ConfigManager.Current.GameConfig.PlayersConfigPath.Add(configFilePath);
+		#region Implementierungen
 
-            // Save new Player
-            SavePlayers();
-            ConfigManager.Current.SaveGameConfig();
+		public Player CreatePlayer(string name) {
+			if (string.IsNullOrEmpty(name)) {
+				throw new ArgumentNullException(name, "Name des Spielers darf nicht leer sein.");
+			}
 
-            return p;
-        }
+			int playerId = this.Players.Count;
+			string playerFolderName = string.Format("{0}_{1}", PlayerFolderPrefix, playerId);
 
-        public void LoadPlayers()
-        {
-            this.Players.Clear();
+			string directoryPath = Path.Combine(ConfigManager.Current.GameDirectoryPath, playerFolderName);
 
-            foreach (string playerConfigPath in ConfigManager.Current.GameConfig.PlayersConfigPath)
-            {
-                string content = FileManager.Read(playerConfigPath);
-                Player p = JsonUtility.FromJson<Player>(content);
-                this.Players.Add(p);
-            }
-        }
+			FileManager.CreateDirectory(directoryPath);
 
-        public bool DeletePlayer(Player player)
-        {
-            if (this.Players.Contains(player))
-            {
-                FileManager.DeleteDirectory(player.DirectoryPath, true);
-                int index = ConfigManager.Current.GameConfig.PlayersConfigPath.IndexOf(player.ConfigFilePath);
-                if (index >= 0 && index < ConfigManager.Current.GameConfig.PlayersConfigPath.Count)
-                {
-                    ConfigManager.Current.GameConfig.PlayersConfigPath.RemoveAt(index);
-                    ConfigManager.Current.SaveGameConfig();
-                }
-                return this.Players.Remove(player);
-            }
-            return false;
-        }
+			string playerConfigName = string.Format("{0}_{1}.cfg", PlayerFolderPrefix, playerId);
+			string configFilePath = Path.Combine(directoryPath, playerConfigName);
 
-        public void CreateMovementFileAtCurrentPlayer()
-        {
-            if (this.CurrentPlayer != null)
-            {
-                string fileName = string.Format("Movement_{0}.csv}", this.CurrentPlayer.MovementFilePaths.Count);
-                string filePath = Path.Combine(this.CurrentPlayer.DirectoryPath, fileName);
-                if (FileManager.Create(filePath))
-                {
-                    this.CurrentPlayer.CurrentMovementFilePath = filePath;
-                }
-            }
-        }
+			FileManager.Create(configFilePath);
 
-        public void WriteMovementFileAtCurrentPlayer(string content)
-        {
-            if (this.CurrentPlayer != null && !string.IsNullOrEmpty(this.CurrentPlayer.CurrentMovementFilePath))
-            {
-                FileManager.Append(this.CurrentPlayer.CurrentMovementFilePath, content);
-            }
-        }
+			Player p = new Player(playerId, name, directoryPath, configFilePath);
 
-        public void SavePlayers()
-        {
-            foreach (Player player in this.Players)
-            {
-                string content = JsonUtility.ToJson(player);
-                FileManager.Write(player.ConfigFilePath, content);
-            }
-        }
-        #endregion
-    }
+			this.Players.Add(p);
+
+			ConfigManager.Current.GameConfig.PlayersConfigPath.Add(configFilePath);
+
+			// Save new Player
+			SavePlayers();
+			ConfigManager.Current.SaveGameConfig();
+
+			return p;
+		}
+
+		public void LoadPlayers() {
+			this.Players.Clear();
+
+			foreach (string playerConfigPath in ConfigManager.Current.GameConfig.PlayersConfigPath) {
+				string content = FileManager.Read(playerConfigPath);
+				Player p = JsonUtility.FromJson<Player>(content);
+				this.Players.Add(p);
+			}
+		}
+
+		public bool DeletePlayer(Player player) {
+			if (this.Players.Contains(player)) {
+				FileManager.DeleteDirectory(player.DirectoryPath, true);
+				int index = ConfigManager.Current.GameConfig.PlayersConfigPath.IndexOf(player.ConfigFilePath);
+				if (index >= 0 && index < ConfigManager.Current.GameConfig.PlayersConfigPath.Count) {
+					ConfigManager.Current.GameConfig.PlayersConfigPath.RemoveAt(index);
+					ConfigManager.Current.SaveGameConfig();
+				}
+				return this.Players.Remove(player);
+			}
+			return false;
+		}
+
+		public void CreateMovementFileAtCurrentPlayer() {
+			if (this.CurrentPlayer != null) {
+				string fileName = string.Format("Movement_{0}.csv}", this.CurrentPlayer.MovementFilePaths.Count);
+				string filePath = Path.Combine(this.CurrentPlayer.DirectoryPath, fileName);
+				if (FileManager.Create(filePath)) {
+					this.CurrentPlayer.CurrentMovementFilePath = filePath;
+				}
+			}
+		}
+
+		public void WriteMovementFileAtCurrentPlayer(string content) {
+			if (this.CurrentPlayer != null && !string.IsNullOrEmpty(this.CurrentPlayer.CurrentMovementFilePath)) {
+				FileManager.Append(this.CurrentPlayer.CurrentMovementFilePath, content);
+			}
+		}
+
+		public void SavePlayers() {
+			foreach (Player player in this.Players) {
+				string content = JsonUtility.ToJson(player);
+				FileManager.Write(player.ConfigFilePath, content);
+			}
+		}
+
+		#endregion
+	}
 }

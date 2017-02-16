@@ -1,143 +1,291 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
+using Profiles;
+using UnityEngine;
 
-public class SpawnManager : MonoBehaviour {
+public class SpawnManager : MonoBehaviour
+{
+    public GameObject StartPrefab;
+    public GameObject EndPrefab;
+    public GameObject EmptyPrefab;
+    public GameObject[] Prefabs;
+    public GameObject[] Backgrounds;
+    public GameObject Wall;
+    public GameObject Coin;
 
-	public GameObject[] prefabs;
-	public GameObject[] backgrounds;
-	public GameObject wall;
-	public GameObject coin;
+    public static SpawnManager Instance;
 
-	private Transform player;
-	private List<GameObject> listOfPrefabs = new List<GameObject> ();
+    private Transform playerTransform;
+    private List<GameObject> listOfPrefabs = new List<GameObject>();
 
-	private float spawnAxisZ = -5.0f;
-	//amount of prefabs per area
-	private int amntPrefabs = 7;
-	private float prefabLength = 25.0f;
-	//number of prefabs visible
-	private int preRenders = 7;
-	//safety area for despawn
-	private float offset = 75.0f;
-	//ID of last used prefab
-	private int prefabID = 2;
-	//number of coins
-	private int amntCoins = 1;
+    private float spawnAxisZ = 7.5f;
+    //amount of prefabs per area
+    private int amountPrefabs = 50;
+    // average length of a prefab
+    private float lastPrefabLength = 0.0f;
+    //number of prefabs visible
+    private int preRenders = 10;
+    //safety area for despawn
+    private float offset = 10.0f;
+    //ID of last used prefab
+    private int prefabID = -1;
+    //number of coins
+    private int amountCoins = 25;
+    // count of tries for Random
+    private int maxRandomTries = 10;
 
-	// Use this for initialization
-	void Start () {
-		player = GameObject.FindGameObjectWithTag ("Player").transform;
-		//spawn Start prefab
-		Spawn (0);
-		for (int i = 2; i < preRenders; i++) {
-			Spawn ();
-		}
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    private StringBuilder stringBuilder;
 
-		if (amntPrefabs == 0 && player.position.z - offset > (spawnAxisZ - preRenders * prefabLength)) {
-			Spawn (1);
-			RemoveOld ();
-			amntPrefabs = -1;
-		} else {
-			//spawn and remove prefabs
-			if (amntPrefabs > 0 && player.position.z - offset > (spawnAxisZ - preRenders * prefabLength)) {
-				Spawn ();
-				RemoveOld ();
-			}
-		}
-	}
+    public int AmountCoins
+    {
+        get
+        {
+            return this.amountCoins;
+        }
+    }
 
-	private void Spawn(int prefabIndex = -1) {
-		GameObject prefab;
-		GameObject borders;
-		GameObject background;
-		GameObject coinSpawn;
+    public int AmountObstacles
+    {
+        get
+        {
+            // TODO: Wenn KI bereit, die EmptyTiles abziehen
+            // -3 wegen Start, End und einem Empty
+            return this.amountPrefabs - 3;
+        }
+    }
 
-		//spawn random prefab
-		if (prefabIndex == -1) {
-			prefab = Instantiate (prefabs [RandomPrefabID ()]) as GameObject;
-		} else {
-			prefab = Instantiate (prefabs [prefabIndex]) as GameObject;
-		}
-		prefab.transform.SetParent (transform);
-		prefab.transform.position = Vector3.forward * spawnAxisZ;
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            DestroyImmediate(gameObject);
+            return;
+        }
+        Instance = this;
+    }
 
-		//add invisible wall
-		borders = Instantiate (wall) as GameObject;
-		borders.transform.SetParent (transform);
+    // Use this for initialization
+    private void Start()
+    {
+        this.stringBuilder = new StringBuilder();
+        this.stringBuilder.AppendLine("x;y;width;height;");
 
-		//add background
-		background = Instantiate(backgrounds[RandomBackgroundID()]) as GameObject;
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+        if (playerObject == null)
+        {
+            throw new NullReferenceException("Player object is Null");
+        }
 
-		//add wall, background as child of prefab for deletion
-		background.transform.SetParent(prefab.transform);
-		borders.transform.SetParent (prefab.transform);
+        playerTransform = playerObject.transform;
 
-		background.transform.position = new Vector3(0, -1, 1 * spawnAxisZ + prefabLength/2);
-		borders.transform.position = Vector3.forward * spawnAxisZ;
+        // spawn start prefab
+        Spawn(StartPrefab);
+        // spawn other prefabs
+        for (int i = 1; i < preRenders; i++)
+        {
+            Spawn();
+        }
+    }
 
-		//spawn coin
-		if (amntCoins > 0 && prefabIndex == -1) {
-			//randomly add a coin
-			int flipcoin = Random.Range (0, 2);
+    // Update is called once per frame
+    private void Update()
+    {
+        if (amountPrefabs == 0 && playerTransform.position.z - offset > (spawnAxisZ - preRenders * lastPrefabLength))
+        {
+            // spawn end prefab
+            Spawn(EmptyPrefab);
+            Spawn(EndPrefab);
+            RemoveOld();
+            amountPrefabs = -1;
+        }
+        //spawn and remove prefabs
+        else if (amountPrefabs > 0 && playerTransform.position.z - offset > (spawnAxisZ - preRenders * lastPrefabLength))
+        {
+            Spawn();
+            RemoveOld();
+        }
+    }
 
-			if (((amntPrefabs > amntCoins) && (flipcoin == 1)) || (amntPrefabs <= amntCoins)) {
+    private void Spawn(GameObject prefabToLoad = null)
+    {
+        GameObject prefab;
+        GameObject borders;
+        GameObject background;
+        GameObject coinSpawn;
 
-				Vector3 coinPosition = new Vector3 (Random.Range (-4, 4), 0.8f, spawnAxisZ + Random.Range (1, 22));
-				//determine random position
-				while((Physics.OverlapSphere (coinPosition, 0.6f)).Length != 0) {
-					coinPosition = new Vector3 (Random.Range (-4, 4), 0.8f, spawnAxisZ + Random.Range (1, 22));				
-					//Debug.Log ("Overlap");
-				}
-				//Debug.Log ("No overlap occurred at tile " + amntPrefabs.ToString ());
-				coinSpawn = Instantiate (coin) as GameObject;
-				coinSpawn.transform.SetParent (transform);
-				coinSpawn.transform.position = coinPosition;
-				coinSpawn.transform.SetParent (prefab.transform);
-				amntCoins--;
-			}		
-		}
+        //spawn random prefab
+        if (prefabToLoad == null)
+        {
+            prefab = Instantiate(Prefabs[RandomPrefabID()],
+                Vector3.forward * spawnAxisZ, Quaternion.identity, transform);
+        }
+        else
+        {
+            prefab = Instantiate(prefabToLoad,
+                Vector3.forward * spawnAxisZ, Quaternion.identity, transform);
+        }
 
-		amntPrefabs--;
-		spawnAxisZ += prefabLength;
-		listOfPrefabs.Add (prefab);
-	
-	}
+        // Get Length of the Prefab
+        float prefabLength = -1.0f;
+        Collider c = prefab.GetComponent<Collider>();
+        if (c != null)
+        {
+            prefabLength = c.bounds.size.z;
+            AppendPositionData(c.bounds, prefab.transform);
+        }
+        else
+        {
+            Renderer r = prefab.GetComponent<Renderer>();
+            if (r != null)
+            {
+                prefabLength = r.bounds.size.z;
+                AppendPositionData(r.bounds, prefab.transform);
+            }
+        }
+        if (prefabLength <= 0.0f)
+        {
+            throw new InvalidOperationException("No Collider or Renderer detected on the Prefab");
+        }
 
-	private int RandomBackgroundID() {
-		int backgroundsL = backgrounds.Length;
-		if (backgroundsL <= 1) {
-			return 0;
-		}
-		int randomID = Random.Range (0, backgroundsL);
-		return randomID;
+        //add wall, background as child of prefab for deletion
+        //add invisible wall
+        borders = Instantiate(Wall,
+            Vector3.forward * spawnAxisZ, Quaternion.identity, prefab.transform);
 
-	}
+        //add background
+        background = Instantiate(Backgrounds[RandomBackgroundID()],
+            new Vector3(0, -1, 1 * spawnAxisZ + prefabLength), Quaternion.identity, prefab.transform);
 
-	private int RandomPrefabID() {
-		//length of array of prefabs
-		int prefabsL = prefabs.Length;
-		if (prefabsL <= 1) {
-			return 0;
-		}
+        //spawn coin
+        if (amountCoins > 0 && prefabToLoad == null)
+        {
+            //randomly add a coin
+            int flipcoin = UnityEngine.Random.Range(0, 2);
 
-		int randomID = prefabID;
-		while (randomID == prefabID) {
-			randomID = Random.Range (2, prefabsL);
-		}
-		prefabID = randomID;
-		return randomID;
+            if (((amountPrefabs > amountCoins) && (flipcoin == 1)) || (amountPrefabs <= amountCoins))
+            {
+                //determine random position
+                Vector3 coinPosition = Vector3.zero;
+                int randomTries = 0;
+                do
+                {
+                    randomTries++;
+                    coinPosition = new Vector3(UnityEngine.Random.Range(-4, 5), 1.0f, spawnAxisZ + UnityEngine.Random.Range(1, prefabLength));
+                } while ((Physics.OverlapSphere(coinPosition, 1.0f)).Length != 0 && randomTries < maxRandomTries);
 
-	}
+                if (randomTries <= maxRandomTries)
+                {
+                    coinSpawn = Instantiate(Coin, coinPosition, Quaternion.identity, prefab.transform);
+                    amountCoins--;
+                }
+            }
+        }
 
-	private void RemoveOld() {
-		//Destroy and Delist old prefabs
-		Destroy (listOfPrefabs [0]);
-		listOfPrefabs.RemoveAt (0);
-	}
+        amountPrefabs--;
+        // scale beachten!
+        this.lastPrefabLength = (prefab.transform.localScale.z < 1.0f) ? prefabLength : (prefabLength / 2.0f);
+        spawnAxisZ += lastPrefabLength;
+        listOfPrefabs.Add(prefab);
+    }
 
+    private int RandomBackgroundID()
+    {
+        int backgroundsLength = Backgrounds.Length;
+        if (backgroundsLength <= 1)
+        {
+            return 0;
+        }
+        int randomID = UnityEngine.Random.Range(0, backgroundsLength);
+        return randomID;
+    }
+
+    private int RandomPrefabID()
+    {
+        //length of array of prefabs
+        int prefabsLength = Prefabs.Length;
+        if (prefabsLength <= 1)
+        {
+            return 0;
+        }
+
+        int randomTries = 0;
+        int randomID = prefabID;
+        while (randomID == prefabID && randomTries < maxRandomTries)
+        {
+            randomTries++;
+            randomID = UnityEngine.Random.Range(0, prefabsLength);
+        }
+        prefabID = randomID;
+        return randomID;
+    }
+
+    private void RemoveOld()
+    {
+        //Destroy and Delist old prefabs
+        Destroy(listOfPrefabs[0]);
+        listOfPrefabs.RemoveAt(0);
+    }
+
+    private void AppendPositionData(Bounds bounds, Transform transform)
+    {
+        if (this.stringBuilder != null)
+        {
+            Transform childTransform = null;
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                childTransform = transform.GetChild(i);
+                if (childTransform.tag == "Obstacle")
+                {
+                    break;
+                }
+                childTransform = null;
+            }
+            if (childTransform != null)
+            {
+                Nullable<Bounds> childBounds = GetBoundsFromChild(childTransform);
+                if (childBounds != null && childBounds.HasValue)
+                {
+                    float childHeight = childBounds.Value.size.z;
+                    float childWidth = childBounds.Value.size.x;
+                    float height = bounds.size.z;
+                    float width = bounds.size.x;
+                    float x = bounds.center.x - width / 2.0f;
+                    float z = bounds.center.z - height / 2.0f;
+                    float childX = childBounds.Value.center.x - childWidth / 2.0f;
+                    float childZ = childBounds.Value.center.z - childHeight / 2.0f;
+                    string line = string.Format("{0};{1};{2};{3};", childX, childZ, childWidth, childHeight);
+                    this.stringBuilder.AppendLine(line);
+                }
+            }
+        }
+    }
+
+    private Nullable<Bounds> GetBoundsFromChild(Transform childTransform)
+    {
+        Collider c = childTransform.GetComponent<Collider>();
+        if (c != null)
+        {
+            return c.bounds;
+        }
+        else
+        {
+            Renderer r = childTransform.GetComponent<Renderer>();
+            if (r != null)
+            {
+                return r.bounds;
+            }
+        }
+        return null;
+    }
+
+    private void OnDestroy()
+    {
+        if (this.stringBuilder != null)
+        {
+            ProfileManager.Current.WriteLevelPositionFile(this.stringBuilder.ToString());
+            this.stringBuilder = null;
+        }
+    }
 }

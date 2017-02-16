@@ -534,7 +534,7 @@ namespace Wii.Controllers
                         this.HIDDevicePath = devicePath;
 
                         // start reading
-                        this.readThread = BeginAsyncRead();
+                        this.readThread = BeginAsyncRead(10);
                         Thread.Sleep(100);
 
                         // get calibration infos
@@ -665,7 +665,6 @@ namespace Wii.Controllers
             overlapped.OffsetLow = 0;
 
             bool result = HIDImports.ReadFile(this.SafeFileHandle.DangerousGetHandle(), buff, (uint)buff.Length, out numberOfBytesRead, ref overlapped);
-
             Log("ReadReport: " + result.ToString());
 
             // parse it

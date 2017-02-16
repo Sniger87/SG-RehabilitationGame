@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using UnityEngine;
 using Wii.Contracts;
@@ -71,8 +72,13 @@ public class BalanceBoardManager
     #region Implementierungen
     public void Connect()
     {
-        Thread t = new Thread(CreateAndConnect);
-        t.Start();
+        //Thread t = new Thread(CreateAndConnect);
+        //t.Start();
+        ProcessStartInfo processInfo = new ProcessStartInfo();
+        processInfo.CreateNoWindow = false;
+        processInfo.FileName = "";
+        processInfo.WindowStyle = ProcessWindowStyle.Maximized;
+        //Process process = Process.Start(processInfo);
     }
 
     private void CreateAndConnect()

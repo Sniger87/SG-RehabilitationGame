@@ -13,6 +13,9 @@ namespace Profiles
     {
         #region Konstanten
         private const string PlayerFolderPrefix = "Player";
+        private const string BalanceBoardMovementsFileName = "BalanceBoardMovements";
+        private const string PlayerPositionsFileName = "PlayerPositions";
+        private const string LevelPositionsFileName = "LevelPositions";
         #endregion
 
         #region Felder
@@ -134,12 +137,26 @@ namespace Profiles
             return false;
         }
 
-        public void CreateMovementFileAtCurrentPlayer()
+        private void CreateCurrentGameFolder()
         {
             if (this.CurrentPlayer != null)
             {
-                string fileName = string.Format("Movement_{0}.csv}", this.CurrentPlayer.MovementFilePaths.Count);
-                string filePath = Path.Combine(this.CurrentPlayer.DirectoryPath, fileName);
+                string timeStamp = DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss");
+                string path = Path.Combine(this.CurrentPlayer.DirectoryPath, timeStamp);
+                if (FileManager.CreateDirectory(path))
+                {
+                    this.CurrentPlayer.CurrentGameFolderPath = path;
+                }
+            }
+        }
+
+        private void CreateMovementFile()
+        {
+            if (this.CurrentPlayer != null)
+            {
+                string timeStamp = DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss");
+                string fileName = string.Format("{0}_{1}.csv", BalanceBoardMovementsFileName, timeStamp);
+                string filePath = Path.Combine(this.CurrentPlayer.CurrentGameFolderPath, fileName);
                 if (FileManager.Create(filePath))
                 {
                     this.CurrentPlayer.CurrentMovementFilePath = filePath;
@@ -147,12 +164,64 @@ namespace Profiles
             }
         }
 
-        public void WriteMovementFileAtCurrentPlayer(string content)
+        public void WriteMovementFile(string content)
         {
             if (this.CurrentPlayer != null && !string.IsNullOrEmpty(this.CurrentPlayer.CurrentMovementFilePath))
             {
                 FileManager.Append(this.CurrentPlayer.CurrentMovementFilePath, content);
             }
+        }
+
+        private void CreatePlayerPositionFile()
+        {
+            if (this.CurrentPlayer != null)
+            {
+                string timeStamp = DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss");
+                string fileName = string.Format("{0}_{1}.csv", PlayerPositionsFileName, timeStamp);
+                string filePath = Path.Combine(this.CurrentPlayer.CurrentGameFolderPath, fileName);
+                if (FileManager.Create(filePath))
+                {
+                    this.CurrentPlayer.CurrentPlayerPositionFilePath = filePath;
+                }
+            }
+        }
+
+        public void WritePlayerPositionFile(string content)
+        {
+            if (this.CurrentPlayer != null && !string.IsNullOrEmpty(this.CurrentPlayer.CurrentPlayerPositionFilePath))
+            {
+                FileManager.Append(this.CurrentPlayer.CurrentPlayerPositionFilePath, content);
+            }
+        }
+
+        private void CreateLevelPositionFile()
+        {
+            if (this.CurrentPlayer != null)
+            {
+                string timeStamp = DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss");
+                string fileName = string.Format("{0}_{1}.csv", LevelPositionsFileName, timeStamp);
+                string filePath = Path.Combine(this.CurrentPlayer.CurrentGameFolderPath, fileName);
+                if (FileManager.Create(filePath))
+                {
+                    this.CurrentPlayer.CurrentLevelPostionFilePath = filePath;
+                }
+            }
+        }
+
+        public void WriteLevelPositionFile(string content)
+        {
+            if (this.CurrentPlayer != null && !string.IsNullOrEmpty(this.CurrentPlayer.CurrentLevelPostionFilePath))
+            {
+                FileManager.Append(this.CurrentPlayer.CurrentLevelPostionFilePath, content);
+            }
+        }
+
+        public void CreateFilesForGame()
+        {
+            CreateCurrentGameFolder();
+            CreateMovementFile();
+            CreatePlayerPositionFile();
+            CreateLevelPositionFile();
         }
 
         public void SavePlayers()

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using FileIO;
 
 namespace Profiles
 {
@@ -22,9 +25,13 @@ namespace Profiles
 
         public List<int> Highscores;
 
-        public List<string> MovementFilePaths;
-
         public string CurrentMovementFilePath { get; set; }
+
+        public string CurrentPlayerPositionFilePath { get; set; }
+
+        public string CurrentLevelPostionFilePath { get; set; }
+
+        public string CurrentGameFolderPath { get; set; }
         #endregion
 
         #region Konstruktor
@@ -40,7 +47,6 @@ namespace Profiles
             this.DirectoryPath = directoryPath;
             this.ConfigFilePath = configFilePath;
             this.Highscores = new List<int>();
-            this.MovementFilePaths = new List<string>();
         }
         #endregion
     }

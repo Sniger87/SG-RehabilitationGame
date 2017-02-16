@@ -1436,16 +1436,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c6890131b3a9fb4b8e0617fee2c3043, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabs:
-  - {fileID: 1000010260765924, guid: 721c48e2e637fb745b171f249b1b1d30, type: 2}
-  - {fileID: 1476309885789400, guid: 0c7245aafb91b34479a54b03b3478e46, type: 2}
-  - {fileID: 1000013373602166, guid: 55ae67112b543b242b797dcf9b6b8079, type: 2}
-  - {fileID: 1000013864572860, guid: 7553478350dcb4247b9fb2907d0859db, type: 2}
-  - {fileID: 1926184417282574, guid: 8a3a2b73c7d12a84b88c16775bd05cca, type: 2}
-  backgrounds:
+  StartPrefab: {fileID: 1766949033587596, guid: b453ebccdf3649c4bada4749621c95e4,
+    type: 2}
+  EndPrefab: {fileID: 1173219528988182, guid: f86e04c1d8f9268408e30ea69f2ef7f1, type: 2}
+  EmptyPrefab: {fileID: 1381205678906102, guid: ed6e806e66757f1448c4cf8972169cb0,
+    type: 2}
+  Prefabs:
+  - {fileID: 1418206051309282, guid: 5bea3c4ea7d5cf9408ac2c0937c633d0, type: 2}
+  - {fileID: 1506076209432480, guid: e0a17c917bbbbf442a42c78218d4108e, type: 2}
+  - {fileID: 1380298631875984, guid: fc7b470124a62ba4b9f78f85e63cf1a0, type: 2}
+  - {fileID: 1497324948214812, guid: 3f3a3b4fe0f4fb04684639e0e64ccd30, type: 2}
+  - {fileID: 1945030862694784, guid: 5d4e4b60d544a5a41878af88ac7d3208, type: 2}
+  - {fileID: 1173150582455710, guid: ce9aa82cdb16f664d8fdbbcafdef180f, type: 2}
+  - {fileID: 1864470031200684, guid: 71956d41f6f298c4588eccce6f8dc97f, type: 2}
+  - {fileID: 1025112410829398, guid: eebc3ce240ea43f4ba79969f12198984, type: 2}
+  - {fileID: 1368645693923996, guid: b95ea6400b4f6314da3cb2bb988f905a, type: 2}
+  - {fileID: 1805776887923546, guid: 312a0de0c1714194994e0491a20879d6, type: 2}
+  - {fileID: 1533503451130674, guid: 2bdf068477b3dc948adb7f95a714c749, type: 2}
+  - {fileID: 1954652118165736, guid: f183ef1bd8e7d1c428a474a64fc74a1a, type: 2}
+  Backgrounds:
   - {fileID: 1274663836633534, guid: 8b977cb667a6b0241a18dbc53b149a5e, type: 2}
-  wall: {fileID: 1651323713678784, guid: 5ae8384259c289a4483f18fb64ea040a, type: 2}
-  coin: {fileID: 1789445490373124, guid: 8d86949d76cfd324fa9b50367d32a4f6, type: 2}
+  Wall: {fileID: 1328869477881938, guid: 5ae8384259c289a4483f18fb64ea040a, type: 2}
+  Coin: {fileID: 1789445490373124, guid: 8d86949d76cfd324fa9b50367d32a4f6, type: 2}
 --- !u!4 &1617639600
 Transform:
   m_ObjectHideFlags: 0

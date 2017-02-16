@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using FileIO;
 
 namespace Profiles
 {
@@ -17,7 +16,7 @@ namespace Profiles
 
         public int Collisions;
 
-	public int Level;
+        public int Level;
 
         public string Name;
 

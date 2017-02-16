@@ -40,20 +40,14 @@ public class SpawnManager : MonoBehaviour
 
     public int AmountCoins
     {
-        get
-        {
-            return this.amountCoins;
-        }
+        get;
+        private set;
     }
 
     public int AmountObstacles
     {
-        get
-        {
-            // TODO: Wenn KI bereit, die EmptyTiles abziehen
-            // -3 wegen Start, End und einem Empty
-            return this.amountPrefabs - 3;
-        }
+        get;
+        private set;
     }
 
     private void Awake()
@@ -69,6 +63,13 @@ public class SpawnManager : MonoBehaviour
     // Use this for initialization
     private void Start()
     {
+        // TODO: umbauen!
+        // wird zurzeit noch hier gesetzt, da amountCoins und amountPrefabs abgezogen wird
+        this.AmountCoins = this.amountCoins;
+        // TODO: Wenn KI bereit, die EmptyTiles abziehen
+        // -3 wegen Start, End und einem Empty
+        this.AmountObstacles = this.amountPrefabs - 3;
+
         this.stringBuilder = new StringBuilder();
         this.stringBuilder.AppendLine("x;y;width;height;");
 

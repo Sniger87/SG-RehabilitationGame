@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Profiles;
 
 public class Collision : MonoBehaviour {
 
-	public Text counter;
-	public Text collisions;
+	public Text coinsTextCounter;
+	public Text collisionsTextCounter;
 	public Text finish;
 	public Text countdown;
 
@@ -15,60 +16,55 @@ public class Collision : MonoBehaviour {
 
 	public AudioClip coinAudioFX;
 	public AudioClip obstacleAudioFX;
-	//public AudioClip coinVisualFX;
-	//public AudioClip obstacleVisualFX;
 
-	private int coinsCollected = 0;
-	private int collisionCounter = 0;
+	private int coinsCounter = 0;
+	private int collisionsCounter = 0;
 	private AudioSource sourceAudio = null;
-	//private ParticleSystem sourceVisual = null;
+	private int maxCollisions; // wird aus dem Log herausgelesen, welches sukzessive aufgebaut wird - also dynamisch waechst
+	private int maxCoins;
+	public Slider successBar;
 
 	void Start() {
-		sourceAudio = gameObject.AddComponent<AudioSource>(); 
-		//sourceVisual = gameObject.AddComponent<ParticleSystem> ();
-		//sourceVisual.main.loop = false;
+		sourceAudio = gameObject.AddComponent<AudioSource>();
+		maxCollisions = 20;
+		maxCoins = 5;
+		changeSuccessBar ();
 	}
 
-	void OnTriggerEnter (Collider col) {
+	private void OnTriggerEnter (Collider col) {
 		if (col.gameObject.tag == "Obstacle") {
 			Destroy (col.gameObject);
-			collisionCounter++;
+			collisionsCounter++;
 			SetText ();
 			PlayFX (obstacleAudioFX);
-			//VisualizeFX (obstacleVisualFX);
+			changeSuccessBar ();
 		}
-
 		if (col.gameObject.tag == "Coin") {
 			Destroy (col.gameObject);
-			coinsCollected++;
+			coinsCounter++;
 			SetText ();
 			PlayFX (coinAudioFX);
-			//VisualizeFX (coinVisualFX);
+			changeSuccessBar ();
 		}
-
 		if (col.gameObject.tag == "Finish") {
 			finish.text = "Geschafft! \n\n";
-			finish.text += "Eingesammelte Münzen:  " + coinsCollected.ToString () + "\n";
+			finish.text += "Eingesammelte Münzen:  " + coinsCounter.ToString () + "\n";
 			finish.text += "Highscore, Zeit, etc...";
 			FinishPanel.SetActive(true);
+			saveInfosIntoUser();
 			//wait 5 seconds
 			StartCoroutine(Wait());
-
-
 		}
 	}
 
-	void SetText () {
-		counter.text = "Coins: " + coinsCollected.ToString ();
-		collisions.text = "Collisions: " + collisionCounter.ToString ();
+	private void SetText () {
+		coinsTextCounter.text = "Coins: " + coinsCounter.ToString ();
+		collisionsTextCounter.text = "Collisions: " + collisionsCounter.ToString ();
 	}
-	void PlayFX(AudioClip clip) {
+
+	private void PlayFX(AudioClip clip) {
 		sourceAudio.clip = clip;
 		sourceAudio.Play ();
-	}
-	void VisualizeFX (AudioClip clip) {
-		//sourceVisual. = clip;
-		//sourceVisual.Play;
 	}
 
 	private IEnumerator Wait() {
@@ -79,5 +75,24 @@ public class Collision : MonoBehaviour {
 			t--;
 		}
 		SceneManager.LoadSceneAsync("Game", LoadSceneMode.Single);
+	}
+
+	private void changeSuccessBar() {
+		// cast ist notwendig und wird mittels der Multiplikation 1f gemacht
+		successBar.value = 1-2*((collisionsCounter*1f)/maxCollisions)+((coinsCounter*1f)/maxCoins);
+	}
+
+	private void saveInfosIntoUser() {
+		int qtyElements = 3;
+		float weightLevel = float.Parse("" + (2.0/qtyElements));
+		float weightCoins = float.Parse("" + (0.25/qtyElements));
+		float weightCollisions = float.Parse("" + (0.75/qtyElements));
+
+		Profiles.ProfileManager.Current.CurrentPlayer.Level += 1;
+
+		Profiles.ProfileManager.Current.CurrentPlayer.Highscores.Add(int.Parse("" +
+		(weightLevel * Profiles.ProfileManager.Current.CurrentPlayer.Level
+		- weightCollisions * Profiles.ProfileManager.Current.CurrentPlayer.Collisions
+		+ weightCoins * Profiles.ProfileManager.Current.CurrentPlayer.Coins)));
 	}
 }

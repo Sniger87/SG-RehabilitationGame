@@ -17,6 +17,8 @@ namespace Profiles
 
         public int Collisions;
 
+	public int Level;
+
         public string Name;
 
         public string DirectoryPath;

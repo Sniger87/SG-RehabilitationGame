@@ -20,7 +20,7 @@ public class SpawnManager : MonoBehaviour
     private Transform playerTransform;
     private List<GameObject> listOfPrefabs = new List<GameObject>();
 
-    private float spawnAxisZ = 7.5f;
+    private float spawnAxisZ = 0f;
     //amount of prefabs per area
     private int amountPrefabs = 50;
     // average length of a prefab
@@ -28,7 +28,7 @@ public class SpawnManager : MonoBehaviour
     //number of prefabs visible
     private int preRenders = 10;
     //safety area for despawn
-    private float offset = 10.0f;
+    private float offset = 15.0f;
     //ID of last used prefab
     private int prefabID = -1;
     //number of coins
@@ -173,7 +173,7 @@ public class SpawnManager : MonoBehaviour
                 do
                 {
                     randomTries++;
-                    coinPosition = new Vector3(UnityEngine.Random.Range(-4, 5), 1.0f, spawnAxisZ + UnityEngine.Random.Range(1, prefabLength));
+                    coinPosition = new Vector3(UnityEngine.Random.Range(-4, 4), 1.0f, spawnAxisZ + UnityEngine.Random.Range(1, prefabLength));
                 } while ((Physics.OverlapSphere(coinPosition, 1.0f)).Length != 0 && randomTries < maxRandomTries);
 
                 if (randomTries <= maxRandomTries)

@@ -25,6 +25,8 @@ public class Collision : MonoBehaviour
     private int maxCollisions;
     private int maxCoins;
 
+	private List<float[]> collisionList = new List<float[]>();
+
     void Start()
     {
         sourceAudio = gameObject.AddComponent<AudioSource>();
@@ -33,36 +35,42 @@ public class Collision : MonoBehaviour
         ChangeSuccessBar();
     }
 
-    private void OnTriggerEnter(Collider col)
-    {
-        if (col.gameObject.tag == "Obstacle")
-        {
-            Destroy(col.gameObject);
-            collisionsCounter++;
-            SetText();
-            PlayFX(ObstacleAudioFX);
-            ChangeSuccessBar();
-        }
-        if (col.gameObject.tag == "Coin")
-        {
-            Destroy(col.gameObject);
-            coinsCounter++;
-            SetText();
-            PlayFX(CoinAudioFX);
-            ChangeSuccessBar();
-        }
-        if (col.gameObject.tag == "Finish")
-        {
-            Finish.text = "Geschafft! \n\n";
-            Finish.text += "Eingesammelte Münzen:  " + coinsCounter.ToString() + "\n";
-            Finish.text += "Highscore, Zeit, etc...";
-            FinishPanel.SetActive(true);
-            SaveInfosIntoUser();
-            //wait 5 seconds
-            StartCoroutine(Wait());
-        }
-    }
+	void OnCollisionEnter (UnityEngine.Collision col) {
+		if (col.gameObject.tag == "Obstacle") {
+			float[] colData = getCollisionData (col);
+			collisionList.Add (colData);
+			Destroy(col.gameObject);
+			collisionsCounter++;
+			SetText();
+			PlayFX(ObstacleAudioFX);
+			ChangeSuccessBar();
+		}
 
+		if (col.gameObject.tag == "Coin") {
+			Destroy(col.gameObject);
+			coinsCounter++;
+			SetText();
+			PlayFX(CoinAudioFX);
+			ChangeSuccessBar();
+		}
+
+	}
+
+
+	void OnTriggerEnter(Collider col) {
+
+		if (col.gameObject.tag == "Finish") {
+			Finish.text = "Geschafft! \n\n";
+			Finish.text += "Eingesammelte Münzen:  " + coinsCounter.ToString() + "\n";
+			Finish.text += "Highscore, Zeit, etc...";
+			FinishPanel.SetActive(true);
+			SaveInfosIntoUser();
+			//wait 5 seconds
+			StartCoroutine(Wait());
+		}
+
+	}
+		
     private void SetText()
     {
         CoinsTextCounter.text = "Coins: " + coinsCounter.ToString();
@@ -86,6 +94,16 @@ public class Collision : MonoBehaviour
         }
         SceneManager.LoadSceneAsync("Game", LoadSceneMode.Single);
     }
+
+	private float[] getCollisionData(UnityEngine.Collision col) {
+		float[] collisionData = new float[2];
+		Vector3 colVec = col.contacts [0].point;
+		collisionData [0] = colVec.z;
+		collisionData [1] = colVec.x;
+		//TODO: to data log
+		Debug.Log(colVec.x);
+		return collisionData;
+	}
 
     private void ChangeSuccessBar()
     {

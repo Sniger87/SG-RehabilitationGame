@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using Wii.Contracts;
 
@@ -79,6 +80,12 @@ namespace Wii.Controllers
         {
             // this appears to change the report type to 0x31 Core Buttons and Accelerometer 
             byte[] buff = ReadData(0x0016, 7);
+        }
+
+        internal override void Initialize(ICalibrationInfo calibrationInfo)
+        {
+            this.WiiControllerState.BalanceBoardState.CalibrationInfo = (BalanceBoardCalibrationInfo)calibrationInfo;
+            this.IsInitialized = true;
         }
 
         /// <summary>

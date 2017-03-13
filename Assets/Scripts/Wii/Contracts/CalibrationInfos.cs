@@ -5,9 +5,16 @@ namespace Wii.Contracts
     /// <summary>
     /// Calibration information
     /// </summary>
+    public interface ICalibrationInfo
+    {
+    }
+
+    /// <summary>
+    /// Calibration information
+    /// </summary>
     [Serializable]
     [DataContract]
-    public struct BalanceBoardCalibrationInfo
+    public struct BalanceBoardCalibrationInfo : ICalibrationInfo
     {
         /// <summary>
         /// Calibration information at 0kg

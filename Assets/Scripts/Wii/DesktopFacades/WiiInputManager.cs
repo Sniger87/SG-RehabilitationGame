@@ -230,7 +230,7 @@ namespace Wii.DesktopFacades
                 default:
                     throw new WiiControllerException("Not supported ControllerType!");
             }
-            wiiController.OpenWiiControllerDeviceHandle(devicePath);
+            //wiiController.OpenWiiControllerDeviceHandle(devicePath);
             if (wiiController != null)
             {
                 collection.Add(wiiController);

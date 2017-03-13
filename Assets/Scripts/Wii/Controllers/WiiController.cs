@@ -193,6 +193,11 @@ namespace Wii.Controllers
         internal abstract void SetCalibrationInfo();
 
         /// <summary>
+        /// Initialize with information and store it on WiiController
+        /// </summary>
+        internal abstract void Initialize(ICalibrationInfo calibrationInfo);
+
+        /// <summary>
         /// Parse data from an extension controller
         /// </summary>
         /// <param name="buff">Data buffer</param>
@@ -492,11 +497,23 @@ namespace Wii.Controllers
         {
             if (this.IsConnected)
             {
+                SetLEDs();
                 Dispose();
             }
         }
 
         public void Connect()
+        {
+            TryOpenAndConnect();
+        }
+
+        public void Connect(ICalibrationInfo calibrationInfo)
+        {
+            TryOpenAndConnect(onlyOpen: true);
+            Initialize(calibrationInfo);
+        }
+
+        private void TryOpenAndConnect(bool onlyOpen = false)
         {
             if (this.IsConnected)
             {
@@ -508,10 +525,10 @@ namespace Wii.Controllers
                 this.HIDDevicePath = WiiInputManager.Current.SearchWiiController(this.ControllerType);
             }
 
-            OpenWiiControllerDeviceHandle(this.HIDDevicePath);
+            OpenWiiControllerDeviceHandle(this.HIDDevicePath, onlyOpen);
         }
 
-        internal void OpenWiiControllerDeviceHandle(string devicePath)
+        internal void OpenWiiControllerDeviceHandle(string devicePath, bool onlyOpen = false)
         {
             // open a read/write handle to our device using the DevicePath returned
             SafeFileHandle safeFileHandle = HIDImports.CreateFile(devicePath, FileAccess.ReadWrite, FileShare.ReadWrite, IntPtr.Zero, FileMode.Open, HIDImports.EFileAttributes.Overlapped, IntPtr.Zero);
@@ -533,28 +550,41 @@ namespace Wii.Controllers
                         this.SafeFileHandle = safeFileHandle;
                         this.HIDDevicePath = devicePath;
 
-                        // start reading
-                        this.readThread = BeginAsyncRead(10);
-                        Thread.Sleep(100);
-
-                        // get calibration infos
-                        this.SetCalibrationInfo();
-
-                        this.IsConnected = true;
-
-                        // get status from the WiiContoller
-                        this.GetStatus();
-
-                        // set LED
-                        this.SetLEDs(true, true, true, true);
-
-                        if (this.readThread != null)
+                        if (onlyOpen)
                         {
-                            this.readThread.Abort();
-                            this.readThread = null;
-                        }
+                            // get calibration infos
+                            this.SetCalibrationInfo();
 
-                        this.readAsync = false;
+                            this.IsConnected = true;
+
+                            // set LED
+                            this.SetLEDs(true, true, true, true);
+                        }
+                        else
+                        {
+                            // start reading
+                            this.readThread = BeginAsyncRead(10);
+                            Thread.Sleep(100);
+
+                            // get calibration infos
+                            this.SetCalibrationInfo();
+
+                            this.IsConnected = true;
+
+                            // get status from the WiiContoller
+                            this.GetStatus();
+
+                            // set LED
+                            this.SetLEDs(true, true, true, true);
+
+                            if (this.readThread != null)
+                            {
+                                this.readThread.Abort();
+                                this.readThread = null;
+                            }
+
+                            this.readAsync = false;
+                        }
                     }
                 }
             }

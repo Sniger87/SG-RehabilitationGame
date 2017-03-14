@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Configurations;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -23,11 +24,11 @@ public class BalanceBoardMenuScript : MonoBehaviour
     public Text BottomLeft;
     public Text BottomRight;
     public Text Weight;
-    public Toggle WeightUnit;
 
     private float nextActionTime = 0.0f;
     private float period = 0.2f;
     private bool updateBalanceBoardState;
+    private bool weightUnitLb;
 
     private CultureInfo currentCulture;
 
@@ -46,6 +47,7 @@ public class BalanceBoardMenuScript : MonoBehaviour
         }
 
         currentCulture = CultureInfo.CurrentCulture;
+        weightUnitLb = ConfigManager.Current.GameConfig.WeightUnitLb;
     }
 
     private void BalanceBoardConnectionChanged(object sender, BalanceBoardConnectionChangedEventArgs e)
@@ -112,21 +114,21 @@ public class BalanceBoardMenuScript : MonoBehaviour
             {
                 BalanceBoardManager.Current.BalanceBoard.GetUpdate();
 
-                if (WeightUnit.isOn)
+                if (weightUnitLb)
                 {
-                    this.TopLeft.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesLb.TopLeft.ToString("###.##", currentCulture.NumberFormat);
-                    this.TopRight.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesLb.TopRight.ToString();
-                    this.BottomLeft.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesLb.BottomLeft.ToString();
-                    this.BottomRight.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesLb.BottomRight.ToString();
-                    this.Weight.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.WeightLb.ToString();
+                    this.TopLeft.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesLb.TopLeft.ToString("F4", currentCulture);
+                    this.TopRight.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesLb.TopRight.ToString("F4", currentCulture);
+                    this.BottomLeft.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesLb.BottomLeft.ToString("F4", currentCulture);
+                    this.BottomRight.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesLb.BottomRight.ToString("F4", currentCulture);
+                    this.Weight.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.WeightLb.ToString("F4", currentCulture);
                 }
                 else
                 {
-                    this.TopLeft.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.TopLeft.ToString();
-                    this.TopRight.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.TopRight.ToString();
-                    this.BottomLeft.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.BottomLeft.ToString();
-                    this.BottomRight.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.BottomRight.ToString();
-                    this.Weight.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.WeightKg.ToString();
+                    this.TopLeft.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.TopLeft.ToString("F4", currentCulture);
+                    this.TopRight.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.TopRight.ToString("F4", currentCulture);
+                    this.BottomLeft.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.BottomLeft.ToString("F4", currentCulture);
+                    this.BottomRight.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.BottomRight.ToString("F4", currentCulture);
+                    this.Weight.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.WeightKg.ToString("F4", currentCulture);
                 }
             }
         }

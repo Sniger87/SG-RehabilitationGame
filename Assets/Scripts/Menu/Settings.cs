@@ -12,12 +12,14 @@ public class Settings : MonoBehaviour
     public GameObject LoadImage;
     public Slider VolumeSlider;
     public Toggle MuteToggle;
+    public Toggle WeightUnitToggle;
     AudioSource audioSource;
 
     // Use this for initialization
     void Start()
     {
         MuteToggle.isOn = ConfigManager.Current.GameConfig.Mute;
+        WeightUnitToggle.isOn = ConfigManager.Current.GameConfig.WeightUnitLb;
         VolumeSlider.value = ConfigManager.Current.GameConfig.VolumeLevel;
 
         audioSource = GameInstance.Instance.MenuAudioSource;
@@ -51,6 +53,7 @@ public class Settings : MonoBehaviour
         LoadImage.SetActive(true);
         ConfigManager.Current.GameConfig.Mute = MuteToggle.isOn;
         ConfigManager.Current.GameConfig.VolumeLevel = VolumeSlider.value;
+        ConfigManager.Current.GameConfig.WeightUnitLb = WeightUnitToggle.isOn;
         ConfigManager.Current.SaveGameConfig();
         SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Single);
     }

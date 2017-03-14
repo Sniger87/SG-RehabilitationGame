@@ -12,12 +12,15 @@ namespace Configurations
 
         public bool Mute;
 
+        public bool WeightUnitLb;
+
         public List<string> PlayersConfigPath;
 
         public GameConfig()
         {
             this.Mute = false;
             this.VolumeLevel = 1.0f;
+            this.WeightUnitLb = false;
             this.PlayersConfigPath = new List<string>();
         }
     }

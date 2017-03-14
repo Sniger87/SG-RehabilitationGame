@@ -278,7 +278,7 @@ namespace Wii.Controllers
         private bool ParseInputReport(byte[] buff)
         {
             InputReport type = (InputReport)buff[0];
-            Log(type.ToString());
+            //Log(type.ToString());
             switch (type)
             {
                 case InputReport.CoreButtons:
@@ -695,7 +695,7 @@ namespace Wii.Controllers
             overlapped.OffsetLow = 0;
 
             bool result = HIDImports.ReadFile(this.SafeFileHandle.DangerousGetHandle(), buff, (uint)buff.Length, out numberOfBytesRead, ref overlapped);
-            Log("ReadReport: " + result.ToString());
+            //Log("ReadReport: " + result.ToString());
 
             // parse it
             if (buff != null && result)

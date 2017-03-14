@@ -19,7 +19,7 @@ public class BalanceBoardManager
     // These are the Win32 error code for file not found or access denied.
     private const int ERROR_FILE_NOT_FOUND = 2;
     private const int ERROR_ACCESS_DENIED = 5;
-    private const string ServiceFolder = "WiiConsoleService";
+    private const string ServiceFolder = @"StreamingAssets\WiiConsoleService";
     private const string ServiceProgram = "WiiConsoleService.exe";
     private const string CalibrationFileName = "BalanceBoardCalibration.json";
     #endregion
@@ -83,6 +83,7 @@ public class BalanceBoardManager
     {
         this.exePath = Path.Combine(Application.dataPath, ServiceFolder);
         this.exePath = Path.Combine(exePath, ServiceProgram);
+        Log(exePath);
         this.calibrationFilePath = Path.Combine(ConfigManager.Current.GameDirectoryPath, CalibrationFileName);
     }
     #endregion
@@ -110,9 +111,15 @@ public class BalanceBoardManager
             balanceBoardProcess.StartInfo.Arguments = this.calibrationFilePath;
             balanceBoardProcess.StartInfo.CreateNoWindow = true;
             balanceBoardProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            balanceBoardProcess.EnableRaisingEvents = true;
-            balanceBoardProcess.Exited += BalanceBoardProcess_Exited;
+            // Funktioniert im Release Build von Unity nicht
+            //balanceBoardProcess.EnableRaisingEvents = true;
+            //balanceBoardProcess.Exited += BalanceBoardProcess_Exited;
             balanceBoardProcess.Start();
+            // Alternative zu Exited-Event
+            Log("Service Process started. Wait for exit ...");
+            balanceBoardProcess.WaitForExit();
+            Log("Service Process exited");
+            BalanceBoardProcess_Exited(balanceBoardProcess, null);
         }
         catch (Win32Exception e)
         {
@@ -140,29 +147,26 @@ public class BalanceBoardManager
     private void BalanceBoardProcess_Exited(object sender, EventArgs e)
     {
         Process process = sender as Process;
-        if (process != null)
+        if (process != null && process.HasExited && process.ExitCode == 0)
         {
-            if (process.ExitCode == 0)
+            // Erfolg! Calibration lesen
+            if (File.Exists(this.calibrationFilePath))
             {
-                // Erfolg! Calibration lesen
-                if (File.Exists(this.calibrationFilePath))
+                using (StreamReader reader = File.OpenText(this.calibrationFilePath))
                 {
-                    using (StreamReader reader = File.OpenText(this.calibrationFilePath))
+                    string line = reader.ReadToEnd();
+                    try
                     {
-                        string line = reader.ReadToEnd();
-                        try
+                        if (this.BalanceBoard == null)
                         {
-                            if (this.BalanceBoard == null)
-                            {
-                                this.BalanceBoard = WiiInputManager.Current.FindWiiController(ControllerType.WiiBalanceBoard) as BalanceBoard;
-                            }
-                            this.BalanceBoard.Connect(JsonUtility.FromJson<BalanceBoardCalibrationInfo>(line));
+                            this.BalanceBoard = WiiInputManager.Current.FindWiiController(ControllerType.WiiBalanceBoard) as BalanceBoard;
                         }
-                        catch (WiiControllerNotFoundException ex)
-                        {
-                            // Kein Controller angeschlossen
-                            Log(ex.Message);
-                        }
+                        this.BalanceBoard.Connect(JsonUtility.FromJson<BalanceBoardCalibrationInfo>(line));
+                    }
+                    catch (WiiControllerNotFoundException ex)
+                    {
+                        // Kein Controller angeschlossen
+                        Log(ex.Message);
                     }
                 }
             }

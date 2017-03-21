@@ -57,8 +57,8 @@ namespace Wii.Controllers
         /// <param name="continuous">Continuous data</param>
         internal override void SetDataReportingMode(bool continuous)
         {
-            // BalanceBoard has CoreButtonsWithExtension 0x34 ReportMode
-            InputReport type = InputReport.CoreButtonsWithExtension;
+            // BalanceBoard has CoreButtonsWith8Extension 0x32 ReportMode
+            InputReport type = InputReport.CoreButtonsWith8Extension;
 
             ClearReport();
 
@@ -100,7 +100,7 @@ namespace Wii.Controllers
             Thread.Sleep(100);
 
             byte[] buff = ReadData(REGISTER_EXTENSION_TYPE, 6);
-            long type = ((long)buff[0] << 40) | ((long)buff[1] << 32) | ((long)buff[2]) << 24 | ((long)buff[3]) << 16 | ((long)buff[4]) << 8 | buff[5];
+            long type = ((long)buff[0] << 40) | ((long)buff[1] << 32) | ((long)buff[2] << 24) | ((long)buff[3] << 16) | ((long)buff[4] << 8) | buff[5];
 
             Log("BalanceBoradType: " + (type == BalanceBoardType).ToString());
 
@@ -108,20 +108,20 @@ namespace Wii.Controllers
             {
                 buff = ReadData(REGISTER_EXTENSION_CALIBRATION, 32);
 
-                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg0.TopRight = (short)((short)buff[4] << 8 | buff[5]);
-                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg0.BottomRight = (short)((short)buff[6] << 8 | buff[7]);
-                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg0.TopLeft = (short)((short)buff[8] << 8 | buff[9]);
-                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg0.BottomLeft = (short)((short)buff[10] << 8 | buff[11]);
+                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg0.TopRight = (short)(((short)buff[4] << 8) | buff[5]);
+                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg0.BottomRight = (short)(((short)buff[6] << 8) | buff[7]);
+                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg0.TopLeft = (short)(((short)buff[8] << 8) | buff[9]);
+                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg0.BottomLeft = (short)(((short)buff[10] << 8) | buff[11]);
 
-                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg17.TopRight = (short)((short)buff[12] << 8 | buff[13]);
-                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg17.BottomRight = (short)((short)buff[14] << 8 | buff[15]);
-                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg17.TopLeft = (short)((short)buff[16] << 8 | buff[17]);
-                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg17.BottomLeft = (short)((short)buff[18] << 8 | buff[19]);
+                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg17.TopRight = (short)(((short)buff[12] << 8) | buff[13]);
+                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg17.BottomRight = (short)(((short)buff[14] << 8) | buff[15]);
+                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg17.TopLeft = (short)(((short)buff[16] << 8) | buff[17]);
+                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg17.BottomLeft = (short)(((short)buff[18] << 8) | buff[19]);
 
-                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg34.TopRight = (short)((short)buff[20] << 8 | buff[21]);
-                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg34.BottomRight = (short)((short)buff[22] << 8 | buff[23]);
-                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg34.TopLeft = (short)((short)buff[24] << 8 | buff[25]);
-                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg34.BottomLeft = (short)((short)buff[26] << 8 | buff[27]);
+                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg34.TopRight = (short)(((short)buff[20] << 8) | buff[21]);
+                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg34.BottomRight = (short)(((short)buff[22] << 8) | buff[23]);
+                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg34.TopLeft = (short)(((short)buff[24] << 8) | buff[25]);
+                this.WiiControllerState.BalanceBoardState.CalibrationInfo.Kg34.BottomLeft = (short)(((short)buff[26] << 8) | buff[27]);
 
                 // ReportMode as continous
                 SetDataReportingMode(true);
@@ -144,10 +144,10 @@ namespace Wii.Controllers
         /// <param name="offset">Offset into data buffer</param>
         internal override void ParseExtension(byte[] buff, int offset)
         {
-            this.WiiControllerState.BalanceBoardState.SensorValuesRaw.TopRight = (short)((short)buff[offset + 0] << 8 | buff[offset + 1]);
-            this.WiiControllerState.BalanceBoardState.SensorValuesRaw.BottomRight = (short)((short)buff[offset + 2] << 8 | buff[offset + 3]);
-            this.WiiControllerState.BalanceBoardState.SensorValuesRaw.TopLeft = (short)((short)buff[offset + 4] << 8 | buff[offset + 5]);
-            this.WiiControllerState.BalanceBoardState.SensorValuesRaw.BottomLeft = (short)((short)buff[offset + 6] << 8 | buff[offset + 7]);
+            this.WiiControllerState.BalanceBoardState.SensorValuesRaw.TopRight = (short)(((short)buff[offset + 0] << 8) | buff[offset + 1]);
+            this.WiiControllerState.BalanceBoardState.SensorValuesRaw.BottomRight = (short)(((short)buff[offset + 2] << 8) | buff[offset + 3]);
+            this.WiiControllerState.BalanceBoardState.SensorValuesRaw.TopLeft = (short)(((short)buff[offset + 4] << 8) | buff[offset + 5]);
+            this.WiiControllerState.BalanceBoardState.SensorValuesRaw.BottomLeft = (short)(((short)buff[offset + 6] << 8) | buff[offset + 7]);
 
             this.WiiControllerState.BalanceBoardState.SensorValuesKg.TopLeft = GetBalanceBoardSensorValue(
                 this.WiiControllerState.BalanceBoardState.SensorValuesRaw.TopLeft,
@@ -209,24 +209,24 @@ namespace Wii.Controllers
                 (this.WiiControllerState.BalanceBoardState.SensorValuesKg.BottomLeft +
                 this.WiiControllerState.BalanceBoardState.SensorValuesKg.BottomRight);
 
-            this.WiiControllerState.BalanceBoardState.CenterOfGravity.X = ((float)(Kx - 1) / (float)(Kx + 1)) * (float)(-BSL / 2);
-            this.WiiControllerState.BalanceBoardState.CenterOfGravity.Y = ((float)(Ky - 1) / (float)(Ky + 1)) * (float)(-BSW / 2);
+            this.WiiControllerState.BalanceBoardState.CenterOfGravity.X = ((Kx - 1.0f) / (Kx + 1.0f)) * ((float)-BSL / 2.0f);
+            this.WiiControllerState.BalanceBoardState.CenterOfGravity.Y = ((Ky - 1.0f) / (Ky + 1.0f)) * ((float)-BSW / 2.0f);
         }
 
         private float GetBalanceBoardSensorValue(short sensor, short min, short mid, short max)
         {
             if (max == mid || mid == min)
             {
-                return 0;
+                return 0.0f;
             }
 
             if (sensor < mid)
             {
-                return 68.0f * ((float)(sensor - min) / (mid - min));
+                return 68.0f * ((float)(sensor - min) / (float)(mid - min));
             }
             else
             {
-                return 68.0f * ((float)(sensor - mid) / (max - mid)) + 68.0f;
+                return 68.0f * ((float)(sensor - mid) / (float)(max - mid)) + 68.0f;
             }
         }
         #endregion

@@ -284,9 +284,31 @@ namespace Wii.Controllers
                 case InputReport.CoreButtons:
                     ParseButtons(buff);
                     break;
-                case InputReport.CoreButtonsWithExtension:
+                case InputReport.CoreButtonsWith3Accel:
+                    ParseButtons(buff);
+                    break;
+                case InputReport.CoreButtonsWith8Extension:
                     ParseButtons(buff);
                     ParseExtension(buff, 3);
+                    break;
+                case InputReport.CoreButtonsWith3AccelAnd12IR:
+                    ParseButtons(buff);
+                    break;
+                case InputReport.CoreButtonsWith19Extension:
+                    ParseButtons(buff);
+                    ParseExtension(buff, 3);
+                    break;
+                case InputReport.CoreButtonsWith3AccelAnd16Extension:
+                    ParseButtons(buff);
+                    ParseExtension(buff, 6);
+                    break;
+                case InputReport.CoreButtonsWith10IRAnd9Extension:
+                    ParseButtons(buff);
+                    ParseExtension(buff, 13);
+                    break;
+                case InputReport.CoreButtonsWith3AccelAnd10IRAnd6Extension:
+                    ParseButtons(buff);
+                    ParseExtension(buff, 16);
                     break;
                 case InputReport.Status:
                     ParseButtons(buff);

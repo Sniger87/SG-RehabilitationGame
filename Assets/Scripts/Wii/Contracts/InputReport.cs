@@ -22,8 +22,32 @@
         /// </summary>
         CoreButtons = 0x30,
         /// <summary>
-        /// Button and extension controller data
+        /// Button and Accelerometer (3 Accelerometer bytes)
         /// </summary>
-        CoreButtonsWithExtension = 0x34,
+        CoreButtonsWith3Accel = 0x31,
+        /// <summary>
+        /// Button and extension controller data (8 Extension bytes)
+        /// </summary>
+        CoreButtonsWith8Extension = 0x32,
+        /// <summary>
+        /// Button and extension controller data (3 Accelerometer and 12 IR bytes)
+        /// </summary>
+        CoreButtonsWith3AccelAnd12IR = 0x33,
+        /// <summary>
+        /// Button and extension controller data (19 Extension bytes)
+        /// </summary>
+        CoreButtonsWith19Extension = 0x34,
+        /// <summary>
+        /// Button and extension controller data (3 Accelerometer and 16 Extension bytes)
+        /// </summary>
+        CoreButtonsWith3AccelAnd16Extension = 0x35,
+        /// <summary>
+        /// Button and extension controller data (10 IR and 9 Extension bytes)
+        /// </summary>
+        CoreButtonsWith10IRAnd9Extension = 0x36,
+        /// <summary>
+        /// Button and extension controller data (3 Accelerometer, 10 IR and 6 Extension bytes)
+        /// </summary>
+        CoreButtonsWith3AccelAnd10IRAnd6Extension = 0x37,
     }
 }

@@ -14,6 +14,8 @@ public class SpawnManager : MonoBehaviour
     public GameObject[] Backgrounds;
     public GameObject Wall;
     public GameObject Coin;
+    public Material[] GroundMaterials;
+    public Material[] ObstacleMaterials;
 
     public static SpawnManager Instance;
 
@@ -35,6 +37,8 @@ public class SpawnManager : MonoBehaviour
     private int amountCoins = 25;
     // count of tries for Random
     private int maxRandomTries = 10;
+    // id for ground material
+    private int groundMaterialID = 0;
 
     private StringBuilder stringBuilder;
 
@@ -69,6 +73,8 @@ public class SpawnManager : MonoBehaviour
         // TODO: Wenn KI bereit, die EmptyTiles abziehen
         // -3 wegen Start, End und einem Empty
         this.AmountObstacles = this.amountPrefabs - 3;
+
+        groundMaterialID = RandomGroundMaterialID();
 
         this.stringBuilder = new StringBuilder();
         this.stringBuilder.AppendLine("x;y;width;height;");
@@ -127,6 +133,15 @@ public class SpawnManager : MonoBehaviour
             prefab = Instantiate(prefabToLoad,
                 Vector3.forward * spawnAxisZ, Quaternion.identity, transform);
         }
+
+        // Set Random Material
+        Renderer renderer = prefab.GetComponent<Renderer>();
+        if (renderer != null)
+        {
+            renderer.material = GroundMaterials[groundMaterialID];
+        }
+
+        SetChildTransformMaterial(prefab.transform);
 
         // Get Length of the Prefab
         float prefabLength = -1.0f;
@@ -202,6 +217,28 @@ public class SpawnManager : MonoBehaviour
         return randomID;
     }
 
+    private int RandomObstacleMaterialID()
+    {
+        int materialsLength = ObstacleMaterials.Length;
+        if (materialsLength <= 1)
+        {
+            return 0;
+        }
+        int randomID = UnityEngine.Random.Range(0, materialsLength);
+        return randomID;
+    }
+
+    private int RandomGroundMaterialID()
+    {
+        int materialsLength = GroundMaterials.Length;
+        if (materialsLength <= 1)
+        {
+            return 0;
+        }
+        int randomID = UnityEngine.Random.Range(0, materialsLength);
+        return randomID;
+    }
+
     private int RandomPrefabID()
     {
         //length of array of prefabs
@@ -227,6 +264,28 @@ public class SpawnManager : MonoBehaviour
         //Destroy and Delist old prefabs
         Destroy(listOfPrefabs[0]);
         listOfPrefabs.RemoveAt(0);
+    }
+
+    private void SetChildTransformMaterial(Transform transform)
+    {
+        Transform childTransform = null;
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            childTransform = transform.GetChild(i);
+            if (childTransform.tag == "Obstacle")
+            {
+                break;
+            }
+            childTransform = null;
+        }
+        if (childTransform != null)
+        {
+            Renderer renderer = childTransform.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                renderer.material = ObstacleMaterials[RandomObstacleMaterialID()];
+            }
+        }
     }
 
     private void AppendPositionData(Bounds bounds, Transform transform)

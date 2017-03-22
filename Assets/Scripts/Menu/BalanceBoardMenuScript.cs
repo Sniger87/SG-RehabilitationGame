@@ -16,6 +16,7 @@ public class BalanceBoardMenuScript : MonoBehaviour
     public GameObject DisconnectingImage;
     public GameObject BalanceBoardConnectedImage;
     public GameObject BalanceBoardDisconnectedImage;
+    public GameObject StatusPanel;
     public Text InfoText;
     public Button ConnectButton;
     public Button DisconnectButton;
@@ -88,6 +89,7 @@ public class BalanceBoardMenuScript : MonoBehaviour
         InfoText.text = "disconnect";
         BalanceBoardConnectedImage.SetActive(false);
         BalanceBoardDisconnectedImage.SetActive(true);
+        StatusPanel.SetActive(false);
     }
 
     private void SetConnectedState()
@@ -97,6 +99,7 @@ public class BalanceBoardMenuScript : MonoBehaviour
         InfoText.text = "connect";
         BalanceBoardConnectedImage.SetActive(true);
         BalanceBoardDisconnectedImage.SetActive(false);
+        StatusPanel.SetActive(true);
     }
 
     // Update is called once per frame

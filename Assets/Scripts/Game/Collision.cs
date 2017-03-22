@@ -101,7 +101,7 @@ public class Collision : MonoBehaviour
 		collisionData [0] = colVec.z;
 		collisionData [1] = colVec.x;
 		//TODO: to data log
-		Debug.Log(colVec.x);
+		//Debug.Log(colVec.x);
 		return collisionData;
 	}
 

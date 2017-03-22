@@ -172,7 +172,7 @@ public class SpawnManager : MonoBehaviour
 
         //add background
         background = Instantiate(Backgrounds[RandomBackgroundID()],
-            new Vector3(0, -1, 1 * spawnAxisZ + prefabLength), Quaternion.identity, prefab.transform);
+            new Vector3(0, -1, 1 * spawnAxisZ), Quaternion.identity, prefab.transform);
 
         //spawn coin
         if (amountCoins > 0 && prefabToLoad == null)
@@ -188,11 +188,12 @@ public class SpawnManager : MonoBehaviour
                 do
                 {
                     randomTries++;
-                    coinPosition = new Vector3(UnityEngine.Random.Range(-4, 4), 1.0f, spawnAxisZ + UnityEngine.Random.Range(1, prefabLength));
-                } while ((Physics.OverlapSphere(coinPosition, 1.0f)).Length != 0 && randomTries < maxRandomTries);
+					coinPosition = new Vector3(UnityEngine.Random.Range(-4f, 4f), 1.0f, spawnAxisZ + UnityEngine.Random.Range(-prefabLength/2f, prefabLength/2f));
+                } while ((Physics.OverlapSphere(coinPosition, 0.95f)).Length != 0 && randomTries < maxRandomTries);
 
                 if (randomTries <= maxRandomTries)
                 {
+					Debug.Log ("Random tries: " +  randomTries.ToString() + "Coin spawned at: " + coinPosition.ToString ());
                     coinSpawn = Instantiate(Coin, coinPosition, Quaternion.identity, prefab.transform);
                     amountCoins--;
                 }
@@ -258,6 +259,12 @@ public class SpawnManager : MonoBehaviour
         prefabID = randomID;
         return randomID;
     }
+
+	private int WeightedPrefabID()
+	{
+
+		return 0;
+	}
 
     private void RemoveOld()
     {

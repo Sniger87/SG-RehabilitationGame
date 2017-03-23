@@ -811,7 +811,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 7
   m_Type: 1
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0.6901961, g: 0.5686275, b: 0.38431373, a: 1}
   m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
@@ -1662,7 +1662,10 @@ MonoBehaviour:
   - {fileID: 1533503451130674, guid: 2bdf068477b3dc948adb7f95a714c749, type: 2}
   - {fileID: 1954652118165736, guid: f183ef1bd8e7d1c428a474a64fc74a1a, type: 2}
   Backgrounds:
-  - {fileID: 1274663836633534, guid: 8b977cb667a6b0241a18dbc53b149a5e, type: 2}
+  - {fileID: 1816544059884512, guid: 4959dfff71d70404491f11fbab5e6e6f, type: 2}
+  - {fileID: 1788032566025934, guid: 0f91fb471c59fc2468dcd7c8c4c28cd6, type: 2}
+  - {fileID: 1948694873966594, guid: 8cabcf0b8c015e3429214ded46cd1373, type: 2}
+  - {fileID: 1551115855928818, guid: 058caad0074379640accc85c93d1924d, type: 2}
   Wall: {fileID: 1328869477881938, guid: 5ae8384259c289a4483f18fb64ea040a, type: 2}
   Coin: {fileID: 1789445490373124, guid: 8d86949d76cfd324fa9b50367d32a4f6, type: 2}
   GroundMaterials:

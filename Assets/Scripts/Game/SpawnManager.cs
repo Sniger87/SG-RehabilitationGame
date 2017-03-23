@@ -22,10 +22,10 @@ public class SpawnManager : MonoBehaviour
     private Transform playerTransform;
     private List<GameObject> listOfPrefabs = new List<GameObject>();
 
-	//KI relevant
-	private KI ki;
-	private int chanceEmpty = 0;
-	private int[] distro;
+    //KI relevant
+    private KI ki;
+    private int chanceEmpty = 0;
+    private int[] distro;
 
     private float spawnAxisZ = 0f;
     //amount of prefabs per area
@@ -59,11 +59,11 @@ public class SpawnManager : MonoBehaviour
         private set;
     }
 
-	public List<float[]> prevCols 
-	{
-		private get;
-		set;
-	}
+    public List<float[]> prevCols
+    {
+        private get;
+        set;
+    }
 
     private void Awake()
     {
@@ -78,10 +78,10 @@ public class SpawnManager : MonoBehaviour
     // Use this for initialization
     private void Start()
     {
-		//KI
-		ki = new KI(prevCols);
-		distro = ki.calculateDistribution ();
-		chanceEmpty = ki.calculateEmpty (amountPrefabs - 3);
+        //KI
+        ki = new KI(prevCols);
+        distro = ki.calculateDistribution();
+        chanceEmpty = ki.calculateEmpty(amountPrefabs - 3);
 
         // TODO: umbauen!
         // wird zurzeit noch hier gesetzt, da amountCoins und amountPrefabs abgezogen wird
@@ -140,26 +140,32 @@ public class SpawnManager : MonoBehaviour
 
         //spawn random prefab
         if (prefabToLoad == null)
-		{
-			if (chanceEmpty > 0) {
-				int rand = UnityEngine.Random.Range (0, 100);
-				if (rand < chanceEmpty) {
-					//spawn empty prefab
-					prefab = Instantiate (EmptyPrefab,
-						Vector3.forward * spawnAxisZ, Quaternion.identity, transform);
-				} else {
-					//spawn according to KI
-					prefab = Instantiate(Prefabs[RandomPrefabID()],
-						Vector3.forward * spawnAxisZ, Quaternion.identity, transform);
-				}
-			} else {
-				//spawn without empty according to KI
-				prefab = Instantiate(Prefabs[RandomPrefabID()],
-					Vector3.forward * spawnAxisZ, Quaternion.identity, transform);
-			}
-           
+        {
+            if (chanceEmpty > 0)
+            {
+                int rand = UnityEngine.Random.Range(0, 100);
+                if (rand < chanceEmpty)
+                {
+                    //spawn empty prefab
+                    prefab = Instantiate(EmptyPrefab,
+                        Vector3.forward * spawnAxisZ, Quaternion.identity, transform);
+                }
+                else
+                {
+                    //spawn according to KI
+                    prefab = Instantiate(Prefabs[RandomPrefabID()],
+                        Vector3.forward * spawnAxisZ, Quaternion.identity, transform);
+                }
+            }
+            else
+            {
+                //spawn without empty according to KI
+                prefab = Instantiate(Prefabs[RandomPrefabID()],
+                    Vector3.forward * spawnAxisZ, Quaternion.identity, transform);
+            }
+
         }
-		else
+        else
         {
             prefab = Instantiate(prefabToLoad,
                 Vector3.forward * spawnAxisZ, Quaternion.identity, transform);
@@ -176,10 +182,12 @@ public class SpawnManager : MonoBehaviour
 
         // Get Length of the Prefab
         float prefabLength = -1.0f;
+        float prefabWidth = -1.0f;
         Collider c = prefab.GetComponent<Collider>();
         if (c != null)
         {
             prefabLength = c.bounds.size.z;
+            prefabWidth = c.bounds.size.x;
             AppendPositionData(c.bounds, prefab.transform);
         }
         else
@@ -188,6 +196,7 @@ public class SpawnManager : MonoBehaviour
             if (r != null)
             {
                 prefabLength = r.bounds.size.z;
+                prefabWidth = r.bounds.size.x;
                 AppendPositionData(r.bounds, prefab.transform);
             }
         }
@@ -203,7 +212,10 @@ public class SpawnManager : MonoBehaviour
 
         //add background
         background = Instantiate(Backgrounds[RandomBackgroundID()],
-            new Vector3(0, -1, 1 * spawnAxisZ), Quaternion.identity, prefab.transform);
+            new Vector3(-prefabWidth - 25, -0.5f, 1 * spawnAxisZ), Quaternion.identity, prefab.transform);
+
+        background = Instantiate(Backgrounds[RandomBackgroundID()],
+            new Vector3(prefabWidth - 5, -0.5f, 1 * spawnAxisZ), Quaternion.identity, prefab.transform);
 
         //spawn coin
         if (amountCoins > 0 && prefabToLoad == null)
@@ -219,12 +231,12 @@ public class SpawnManager : MonoBehaviour
                 do
                 {
                     randomTries++;
-					coinPosition = new Vector3(UnityEngine.Random.Range(-4f, 4f), 1.0f, spawnAxisZ + UnityEngine.Random.Range(-prefabLength/2f, prefabLength/2f));
+                    coinPosition = new Vector3(UnityEngine.Random.Range(-4f, 4f), 1.0f, spawnAxisZ + UnityEngine.Random.Range(-prefabLength / 2f, prefabLength / 2f));
                 } while ((Physics.OverlapSphere(coinPosition, 0.95f)).Length != 0 && randomTries < maxRandomTries);
 
                 if (randomTries <= maxRandomTries)
                 {
-					//Debug.Log ("Random tries: " +  randomTries.ToString() + "Coin spawned at: " + coinPosition.ToString ());
+                    //Debug.Log ("Random tries: " +  randomTries.ToString() + "Coin spawned at: " + coinPosition.ToString ());
                     coinSpawn = Instantiate(Coin, coinPosition, Quaternion.identity, prefab.transform);
                     amountCoins--;
                 }
@@ -291,20 +303,25 @@ public class SpawnManager : MonoBehaviour
         return randomID;
     }
 
-	private int WeightedPrefabID()
-	{
-		
-		int total = distro [0] + distro [1] + distro [2];
-		int rand = UnityEngine.Random.Range (0, total);
-		if (rand <= distro [0]) {
-			//don't chose left prefab
-		} else if (rand <= distro[1] + distro[0]) {
-			//don't chose center prefab
-		} else {
-			//don't chose right prefab
-		}
-		return 0;
-	}
+    private int WeightedPrefabID()
+    {
+
+        int total = distro[0] + distro[1] + distro[2];
+        int rand = UnityEngine.Random.Range(0, total);
+        if (rand <= distro[0])
+        {
+            //don't chose left prefab
+        }
+        else if (rand <= distro[1] + distro[0])
+        {
+            //don't chose center prefab
+        }
+        else
+        {
+            //don't chose right prefab
+        }
+        return 0;
+    }
 
     private void RemoveOld()
     {
@@ -395,5 +412,5 @@ public class SpawnManager : MonoBehaviour
             this.stringBuilder = null;
         }
     }
-		
+
 }

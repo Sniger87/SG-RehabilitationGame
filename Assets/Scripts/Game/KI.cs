@@ -19,23 +19,25 @@ public class KI {
 
 	public KI (List<float[]> col) {
 
-		//determine hits
-		foreach (float[] d in col) {
-			if (d[1] < -1.5f) {
-				hitsLeft++;
-			} else if (d[1] >= 1.5f && d[1] < 1.5f) {
-				hitsCenter++;
-			} else if (d[1] >= 1.5f) {
-				hitsRight++;
+		if (col != null) {
+			//determine hits
+			foreach (float[] d in col) {
+				if (d [1] < -1.5f) {
+					hitsLeft++;
+				} else if (d [1] >= -1.5f && d [1] < 1.5f) {
+					hitsCenter++;
+				} else if (d [1] >= 1.5f) {
+					hitsRight++;
+				}
+				hitsTotal++;
 			}
-			hitsTotal++;
+			Debug.LogFormat ("KI created, L : {0}, C : {1}, R : {2}, T : {3}", hitsLeft, hitsCenter, hitsRight, hitsTotal);  
+	
+		} else {
+			Debug.Log ("Empty KI created");
 		}
-		Debug.LogFormat ("KI created, L : {0}, C : {1}, R : {2}, T : {3}", hitsLeft, hitsCenter, hitsRight, hitsTotal);  
 	}
-	// Use this for initialization
-	void Start () {
-
-	}
+		
 
 	//calculate speed adjustment, threshold is amount of collidable objects
 	//mind the speed limits
@@ -54,18 +56,26 @@ public class KI {
 		return newSpeed;
 	}
 
+	//probability of empty prefab occuring
+	public int calculateEmpty(int collidable) {
+		int prob = 0;
+		//TODO: formel anpassen für bessere interpolation bei wenig kollisionen
+		prob = Mathf.RoundToInt (hitsTotal * 100 / collidable);
+		return prob;
+	}
+
 	//calculate % of appearance in left, right or center, total ~100
 	public int[] calculateDistribution() {
 		int[] distro = {0, 0, 0};
 		if (hitsTotal != 0) {
 			if (hitsLeft != 0) {
-				distro [0] = Mathf.RoundToInt ((hitsLeft / hitsTotal) * 100);
+				distro [0] = Mathf.RoundToInt (hitsLeft * 100 / hitsTotal);
 			}
 			if (hitsCenter != 0) {
-				distro [1] = Mathf.RoundToInt ((hitsCenter / hitsTotal) * 100);
+				distro [1] = Mathf.RoundToInt (hitsCenter * 100 / hitsTotal);
 			}
 			if (hitsRight != 0) {
-				distro [2] = Mathf.RoundToInt ((hitsRight / hitsTotal) * 100);
+				distro [2] = Mathf.RoundToInt (hitsRight * 100 / hitsTotal);
 			}
 
 		} else {

@@ -65,6 +65,8 @@ public class Collision : MonoBehaviour
 			Finish.text += "Highscore, Zeit, etc...";
 			FinishPanel.SetActive(true);
 			SaveInfosIntoUser();
+			//collision data to spawnmanager
+			SpawnManager.Instance.prevCols = collisionList;
 			//wait 5 seconds
 			StartCoroutine(Wait());
 		}

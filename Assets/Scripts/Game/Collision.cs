@@ -25,7 +25,7 @@ public class Collision : MonoBehaviour
     private int maxCollisions;
     private int maxCoins;
 
-	private List<float[]> collisionList = new List<float[]>();
+    private List<float[]> collisionList = new List<float[]>();
 
     void Start()
     {
@@ -35,44 +35,47 @@ public class Collision : MonoBehaviour
         ChangeSuccessBar();
     }
 
-	void OnCollisionEnter (UnityEngine.Collision col) {
-		if (col.gameObject.tag == "Obstacle") {
-			float[] colData = getCollisionData (col);
-			collisionList.Add (colData);
-			Destroy(col.gameObject);
-			collisionsCounter++;
-			SetText();
-			PlayFX(ObstacleAudioFX);
-			ChangeSuccessBar();
-		}
+    void OnCollisionEnter(UnityEngine.Collision col)
+    {
+        if (col.gameObject.tag == "Obstacle")
+        {
+            float[] colData = getCollisionData(col);
+            collisionList.Add(colData);
+            Destroy(col.gameObject);
+            collisionsCounter++;
+            SetText();
+            PlayFX(ObstacleAudioFX);
+            ChangeSuccessBar();
+        }
 
-		if (col.gameObject.tag == "Coin") {
-			Destroy(col.gameObject);
-			coinsCounter++;
-			SetText();
-			PlayFX(CoinAudioFX);
-			ChangeSuccessBar();
-		}
+        if (col.gameObject.tag == "Coin")
+        {
+            Destroy(col.gameObject);
+            coinsCounter++;
+            SetText();
+            PlayFX(CoinAudioFX);
+            ChangeSuccessBar();
+        }
 
-	}
+    }
 
+    void OnTriggerEnter(Collider col)
+    {
+        if (col.gameObject.tag == "Finish")
+        {
+            SaveInfosIntoUser();
+            Finish.text = string.Format("Success!\nCoins gained: {0}/{1}\nHighscore: {2}",
+                coinsCounter.ToString(),
+                SpawnManager.Instance.AmountCoins.ToString(),
+                ProfileManager.Current.CurrentPlayer.CurrentHighscore);
+            FinishPanel.SetActive(true);
+            //collision data to ki
+            KI.Instance.reset(collisionList);
+            //wait 3 seconds
+            StartCoroutine(Wait());
+        }
+    }
 
-	void OnTriggerEnter(Collider col) {
-
-		if (col.gameObject.tag == "Finish") {
-			Finish.text = "Geschafft! \n\n";
-			Finish.text += "Eingesammelte Münzen:  " + coinsCounter.ToString() + "\n";
-			Finish.text += "Highscore, Zeit, etc...";
-			FinishPanel.SetActive(true);
-			SaveInfosIntoUser();
-			//collision data to ki
-			KI.Instance.reset (collisionList);
-			//wait 5 seconds
-			StartCoroutine(Wait());
-		}
-
-	}
-		
     private void SetText()
     {
         CoinsTextCounter.text = "Coins: " + coinsCounter.ToString();
@@ -87,24 +90,26 @@ public class Collision : MonoBehaviour
 
     private IEnumerator Wait()
     {
-        int t = 5;
+        int t = 3;
         while (t > 0)
         {
-            Countdown.text = t.ToString();
+            Countdown.text = string.Format("Next Round in\n{0}",
+                t.ToString());
             yield return new WaitForSeconds(1.5f);
             t--;
         }
         SceneManager.LoadSceneAsync("Game", LoadSceneMode.Single);
     }
 
-	private float[] getCollisionData(UnityEngine.Collision col) {
-		float[] collisionData = new float[2];
-		Vector3 colVec = col.contacts [0].point;
-		collisionData [0] = colVec.z;
-		collisionData [1] = colVec.x;
-		//Debug.Log(colVec.x);
-		return collisionData;
-	}
+    private float[] getCollisionData(UnityEngine.Collision col)
+    {
+        float[] collisionData = new float[2];
+        Vector3 colVec = col.contacts[0].point;
+        collisionData[0] = colVec.z;
+        collisionData[1] = colVec.x;
+        //Debug.Log(colVec.x);
+        return collisionData;
+    }
 
     private void ChangeSuccessBar()
     {
@@ -121,20 +126,19 @@ public class Collision : MonoBehaviour
         {
             Profiles.Player currentPlayer = ProfileManager.Current.CurrentPlayer;
 
-            float qtyElements = 3.0f;
-            float weightLevel = (2.0f / qtyElements);
-            float weightCoins = (0.25f / qtyElements);
-            float weightCollisions = (0.75f / qtyElements);
+            float weightCoins = (75.0f);
+            int chanceEmpty = KI.Instance.calculateEmpty(SpawnManager.Instance.AmountObstacles);
+            if (chanceEmpty == 0)
+            {
+                chanceEmpty = 1;
+            }
+            float weightCollisions = (25.0f * chanceEmpty);
 
-            currentPlayer.Level += 1;
             currentPlayer.Coins = coinsCounter;
             currentPlayer.Collisions = collisionsCounter;
 
-            int highscore = (int)((weightLevel * currentPlayer.Level)
-                - (weightCollisions * currentPlayer.Collisions)
+            currentPlayer.CurrentHighscore += (int)(-(weightCollisions * currentPlayer.Collisions)
                 + (weightCoins * currentPlayer.Coins));
-
-            currentPlayer.Highscores.Add(highscore);
         }
     }
 }

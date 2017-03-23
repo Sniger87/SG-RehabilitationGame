@@ -12,6 +12,7 @@ public class Movement : MonoBehaviour
     private StringBuilder positionBuilder;
     private StringBuilder movementBuilder;
     private Collider playerCollider;
+    private Animator animator;
 
     private Thread updateThread;
 
@@ -34,6 +35,7 @@ public class Movement : MonoBehaviour
 
         controller = GetComponent<CharacterController>();
         playerCollider = GetComponent<Collider>();
+        animator = GetComponent<Animator>();
 
         this.updateThread = new Thread(UpdateBalanceBoardMovement);
         this.updateThread.Start();
@@ -42,6 +44,22 @@ public class Movement : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        if (GameUI.Instance.IsPause)
+        {
+            //if (animator != null && animator.enabled)
+            //{
+            //    animator.enabled = false;
+            //}
+            return;
+        }
+        //else
+        //{
+        //    if (animator != null && !animator.enabled)
+        //    {
+        //        animator.enabled = true;
+        //    }
+        //}
+
         moveVector = Vector3.zero;
         if (controller.isGrounded)
         {

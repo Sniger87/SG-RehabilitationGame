@@ -16,13 +16,13 @@ namespace Profiles
 
         public int Collisions;
 
-        public int Level;
-
         public string Name;
 
         public string DirectoryPath;
 
         public string ConfigFilePath;
+
+        public int CurrentHighscore { get; set; }
 
         public List<int> Highscores;
 

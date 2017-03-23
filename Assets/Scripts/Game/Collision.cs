@@ -65,8 +65,8 @@ public class Collision : MonoBehaviour
 			Finish.text += "Highscore, Zeit, etc...";
 			FinishPanel.SetActive(true);
 			SaveInfosIntoUser();
-			//collision data to spawnmanager
-			SpawnManager.Instance.prevCols = collisionList;
+			//collision data to ki
+			KI.Instance.reset (collisionList);
 			//wait 5 seconds
 			StartCoroutine(Wait());
 		}
@@ -102,7 +102,6 @@ public class Collision : MonoBehaviour
 		Vector3 colVec = col.contacts [0].point;
 		collisionData [0] = colVec.z;
 		collisionData [1] = colVec.x;
-		//TODO: to data log
 		//Debug.Log(colVec.x);
 		return collisionData;
 	}

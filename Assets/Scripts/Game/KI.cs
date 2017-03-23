@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class KI {
+public class KI : MonoBehaviour {
 
 	private int hitsLeft = 0;
 	private int hitsRight = 0;
@@ -12,12 +12,23 @@ public class KI {
 	private int speedMin = 1;
 	private int speedMax = 10;
 
+	public List<float[]> prevCols { private get; set;}
+
+	public static KI Instance { get; private set; }
+
+	void Awake() {
+		if (Instance != null && Instance != this) {
+			DestroyImmediate(gameObject);
+			return;
+		}
+		Instance = this;
+	}
 
 	public KI() {
 
 	}
 
-	public KI (List<float[]> col) {
+	/**public KI (List<float[]> col) {
 
 		if (col != null) {
 			//determine hits
@@ -36,7 +47,7 @@ public class KI {
 		} else {
 			Debug.Log ("Empty KI created");
 		}
-	}
+	} **/
 		
 
 	//calculate speed adjustment, threshold is amount of collidable objects
@@ -84,6 +95,32 @@ public class KI {
 		}
 
 		return distro;
+	}
+
+	public void reset(List<float[]> col) {
+		hitsTotal = 0;
+		hitsLeft = 0;
+		hitsRight = 0;
+		hitsCenter = 0;
+		if (col != null) {
+			//determine hits
+			foreach (float[] d in col) {
+				if (d [1] < -1.5f) {
+					hitsLeft++;
+				} else if (d [1] >= -1.5f && d [1] < 1.5f) {
+					hitsCenter++;
+				} else if (d [1] >= 1.5f) {
+					hitsRight++;
+				}
+				hitsTotal++;
+			}
+			Debug.LogFormat ("KI created, L : {0}, C : {1}, R : {2}, T : {3}", hitsLeft, hitsCenter, hitsRight, hitsTotal);
+			//Debug.Log ("KI reset");
+
+		} else {
+			Debug.Log ("Empty KI created");
+		}
+
 	}
 
 }

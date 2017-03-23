@@ -23,7 +23,6 @@ public class SpawnManager : MonoBehaviour
     private List<GameObject> listOfPrefabs = new List<GameObject>();
 
 	//KI relevant
-	private KI ki;
 	private int chanceEmpty = 0;
 	private int[] distro;
 
@@ -59,12 +58,6 @@ public class SpawnManager : MonoBehaviour
         private set;
     }
 
-	public List<float[]> prevCols 
-	{
-		private get;
-		set;
-	}
-
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -79,9 +72,10 @@ public class SpawnManager : MonoBehaviour
     private void Start()
     {
 		//KI
-		ki = new KI(prevCols);
-		distro = ki.calculateDistribution ();
-		chanceEmpty = ki.calculateEmpty (amountPrefabs - 3);
+		distro = KI.Instance.calculateDistribution ();
+		chanceEmpty = KI.Instance.calculateEmpty (amountPrefabs - 3);
+		Debug.Log (distro [1]);
+		Debug.Log (chanceEmpty);
 
         // TODO: umbauen!
         // wird zurzeit noch hier gesetzt, da amountCoins und amountPrefabs abgezogen wird

@@ -22,9 +22,9 @@ public class SpawnManager : MonoBehaviour
     private Transform playerTransform;
     private List<GameObject> listOfPrefabs = new List<GameObject>();
 
-	//KI relevant
-	private int chanceEmpty = 0;
-	private int[] distro;
+    //KI relevant
+    private int chanceEmpty = 0;
+    private int[] distro;
 
     private float spawnAxisZ = 0f;
     //amount of prefabs per area
@@ -71,11 +71,11 @@ public class SpawnManager : MonoBehaviour
     // Use this for initialization
     private void Start()
     {
-		//KI
-		distro = KI.Instance.calculateDistribution ();
-		chanceEmpty = KI.Instance.calculateEmpty (amountPrefabs - 3);
-		Debug.Log (distro [1]);
-		Debug.Log (chanceEmpty);
+        //KI
+        distro = KI.Instance.calculateDistribution();
+        chanceEmpty = KI.Instance.calculateEmpty(amountPrefabs - 3);
+        //Debug.Log(distro[1]);
+        //Debug.Log(chanceEmpty);
 
         // TODO: umbauen!
         // wird zurzeit noch hier gesetzt, da amountCoins und amountPrefabs abgezogen wird

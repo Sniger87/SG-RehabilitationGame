@@ -32,6 +32,7 @@ public class GameUI : MonoBehaviour
 
     public void BackToMenu()
     {
+        DestroyImmediate(GameObject.FindGameObjectWithTag("KI"), true);
         GameInstance.Instance.MenuAudioSource.Play();
         SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Single);
     }

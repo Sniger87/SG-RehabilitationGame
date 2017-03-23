@@ -2,125 +2,120 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class KI : MonoBehaviour {
+public class KI : MonoBehaviour
+{
+    private int hitsLeft = 0;
+    private int hitsRight = 0;
+    private int hitsCenter = 0;
+    private int hitsTotal = 0;
 
-	private int hitsLeft = 0;
-	private int hitsRight = 0;
-	private int hitsCenter = 0;
-	private int hitsTotal = 0;
+    private int speedMin = 1;
+    private int speedMax = 10;
 
-	private int speedMin = 1;
-	private int speedMax = 10;
+    public static KI Instance { get; private set; }
 
-	public List<float[]> prevCols { private get; set;}
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            DestroyImmediate(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(this);
+    }
 
-	public static KI Instance { get; private set; }
+    //calculate speed adjustment, threshold is amount of collidable objects
+    //mind the speed limits
+    public int calculateSpeed(int currentSpeed, int threshold)
+    {
+        int newSpeed = currentSpeed;
 
-	void Awake() {
-		if (Instance != null && Instance != this) {
-			DestroyImmediate(gameObject);
-			return;
-		}
-		Instance = this;
-	}
+        //too many hits, decrease speed
+        if (hitsTotal > threshold && currentSpeed > speedMin)
+        {
+            newSpeed--;
+            //no hits or less than 5% hit, increase speed
+        }
+        else if ((hitsTotal == 0 || hitsTotal < Mathf.RoundToInt(threshold / 5))
+          && currentSpeed < speedMax)
+        {
+            newSpeed++;
+        }
 
-	public KI() {
+        return newSpeed;
+    }
 
-	}
+    //probability of empty prefab occuring
+    public int calculateEmpty(int collidable)
+    {
+        int prob = 0;
+        //TODO: formel anpassen für bessere interpolation bei wenig kollisionen
+        prob = Mathf.RoundToInt(hitsTotal * 100 / collidable);
+        return prob;
+    }
 
-	/**public KI (List<float[]> col) {
+    //calculate % of appearance in left, right or center, total ~100
+    public int[] calculateDistribution()
+    {
+        int[] distro = { 0, 0, 0 };
+        if (hitsTotal != 0)
+        {
+            if (hitsLeft != 0)
+            {
+                distro[0] = Mathf.RoundToInt(hitsLeft * 100 / hitsTotal);
+            }
+            if (hitsCenter != 0)
+            {
+                distro[1] = Mathf.RoundToInt(hitsCenter * 100 / hitsTotal);
+            }
+            if (hitsRight != 0)
+            {
+                distro[2] = Mathf.RoundToInt(hitsRight * 100 / hitsTotal);
+            }
 
-		if (col != null) {
-			//determine hits
-			foreach (float[] d in col) {
-				if (d [1] < -1.5f) {
-					hitsLeft++;
-				} else if (d [1] >= -1.5f && d [1] < 1.5f) {
-					hitsCenter++;
-				} else if (d [1] >= 1.5f) {
-					hitsRight++;
-				}
-				hitsTotal++;
-			}
-			Debug.LogFormat ("KI created, L : {0}, C : {1}, R : {2}, T : {3}", hitsLeft, hitsCenter, hitsRight, hitsTotal);  
-	
-		} else {
-			Debug.Log ("Empty KI created");
-		}
-	} **/
-		
+        }
+        else
+        {
+            int[] equal = { 33, 33, 33 };
+            return equal;
+        }
 
-	//calculate speed adjustment, threshold is amount of collidable objects
-	//mind the speed limits
-	public int calculateSpeed(int currentSpeed, int threshold) {
-		int newSpeed = currentSpeed;
+        return distro;
+    }
 
-		//too many hits, decrease speed
-		if (hitsTotal > threshold && currentSpeed > speedMin) {
-			newSpeed--;
-			//no hits or less than 5% hit, increase speed
-		} else if ((hitsTotal == 0 || hitsTotal < Mathf.RoundToInt (threshold / 5)) 
-			&& currentSpeed < speedMax) {
-			newSpeed++;
-		}
+    public void reset(List<float[]> col)
+    {
+        hitsTotal = 0;
+        hitsLeft = 0;
+        hitsRight = 0;
+        hitsCenter = 0;
+        if (col != null)
+        {
+            //determine hits
+            foreach (float[] d in col)
+            {
+                if (d[1] < -1.5f)
+                {
+                    hitsLeft++;
+                }
+                else if (d[1] >= -1.5f && d[1] < 1.5f)
+                {
+                    hitsCenter++;
+                }
+                else if (d[1] >= 1.5f)
+                {
+                    hitsRight++;
+                }
+                hitsTotal++;
+            }
+            //Debug.LogFormat("KI created, L : {0}, C : {1}, R : {2}, T : {3}", hitsLeft, hitsCenter, hitsRight, hitsTotal);
+            //Debug.Log ("KI reset");
 
-		return newSpeed;
-	}
-
-	//probability of empty prefab occuring
-	public int calculateEmpty(int collidable) {
-		int prob = 0;
-		//TODO: formel anpassen für bessere interpolation bei wenig kollisionen
-		prob = Mathf.RoundToInt (hitsTotal * 100 / collidable);
-		return prob;
-	}
-
-	//calculate % of appearance in left, right or center, total ~100
-	public int[] calculateDistribution() {
-		int[] distro = {0, 0, 0};
-		if (hitsTotal != 0) {
-			if (hitsLeft != 0) {
-				distro [0] = Mathf.RoundToInt (hitsLeft * 100 / hitsTotal);
-			}
-			if (hitsCenter != 0) {
-				distro [1] = Mathf.RoundToInt (hitsCenter * 100 / hitsTotal);
-			}
-			if (hitsRight != 0) {
-				distro [2] = Mathf.RoundToInt (hitsRight * 100 / hitsTotal);
-			}
-
-		} else {
-			int[] equal = { 33, 33, 33 };
-			return equal;
-		}
-
-		return distro;
-	}
-
-	public void reset(List<float[]> col) {
-		hitsTotal = 0;
-		hitsLeft = 0;
-		hitsRight = 0;
-		hitsCenter = 0;
-		if (col != null) {
-			//determine hits
-			foreach (float[] d in col) {
-				if (d [1] < -1.5f) {
-					hitsLeft++;
-				} else if (d [1] >= -1.5f && d [1] < 1.5f) {
-					hitsCenter++;
-				} else if (d [1] >= 1.5f) {
-					hitsRight++;
-				}
-				hitsTotal++;
-			}
-			Debug.LogFormat ("KI created, L : {0}, C : {1}, R : {2}, T : {3}", hitsLeft, hitsCenter, hitsRight, hitsTotal);
-			//Debug.Log ("KI reset");
-
-		} else {
-			Debug.Log ("Empty KI created");
-		}
-
-	}
-
+        }
+        else
+        {
+            //Debug.Log("Empty KI created");
+        }
+    }
 }

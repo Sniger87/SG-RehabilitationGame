@@ -25,11 +25,13 @@ public class Collision : MonoBehaviour
     private AudioSource sourceAudio = null;
     private int maxCollisions;
     private int maxCoins;
+    private bool hasTriggered;
 
     private List<float[]> collisionList = new List<float[]>();
 
     void Start()
     {
+        this.hasTriggered = false;
         sourceAudio = gameObject.AddComponent<AudioSource>();
         sourceAudio.mute = ConfigManager.Current.GameConfig.EffectsMute;
         sourceAudio.volume = ConfigManager.Current.GameConfig.EffectsVolumeLevel;
@@ -63,8 +65,9 @@ public class Collision : MonoBehaviour
 
     void OnTriggerEnter(Collider col)
     {
-        if (col.gameObject.tag == "Finish")
+        if (col.gameObject.tag == "Finish" && !this.hasTriggered)
         {
+            this.hasTriggered = true;
             SaveInfosIntoUser();
             Finish.text = string.Format("Success!\nCoins gained: {0}/{1}\nHighscore: {2}",
                 coinsCounter.ToString(),
@@ -134,7 +137,7 @@ public class Collision : MonoBehaviour
             {
                 chanceEmpty = 1;
             }
-            float weightCollisions = (25.0f * chanceEmpty);
+            float weightCollisions = (25.0f * (chanceEmpty / 10.0f));
 
             currentPlayer.Coins = coinsCounter;
             currentPlayer.Collisions = collisionsCounter;

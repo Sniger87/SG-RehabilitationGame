@@ -76,6 +76,18 @@ public class BalanceBoardManager
             return false;
         }
     }
+
+    public float XMin
+    {
+        get;
+        set;
+    }
+
+    public float XMax
+    {
+        get;
+        set;
+    }
     #endregion
 
     #region Konstruktor
@@ -91,8 +103,36 @@ public class BalanceBoardManager
     #region Implementierungen
     public void Connect()
     {
-        Thread t = new Thread(new ParameterizedThreadStart(CreateAndConnect));
-        t.Start(this.exePath);
+        if (Search())
+        {
+            Thread t = new Thread(new ParameterizedThreadStart(CreateAndConnect));
+            t.Start(this.exePath);
+        }
+        else
+        {
+            // signal program to cancel connecting
+            if (BalanceBoardConnectionChanged != null)
+            {
+                BalanceBoardConnectionChanged(this, new BalanceBoardConnectionChangedEventArgs(this.BalanceBoard));
+            }
+        }
+    }
+
+    private bool Search()
+    {
+        try
+        {
+            this.BalanceBoard = WiiInputManager.Current.FindWiiController(ControllerType.WiiBalanceBoard) as BalanceBoard;
+            if (this.BalanceBoard != null)
+            {
+                return true;
+            }
+            return false;
+        }
+        catch (WiiControllerNotFoundException)
+        {
+            return false;
+        }
     }
 
     private void CreateAndConnect(object path)

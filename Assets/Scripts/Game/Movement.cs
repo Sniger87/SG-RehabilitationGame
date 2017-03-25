@@ -21,6 +21,8 @@ public class Movement : MonoBehaviour
     private float gravity = 12.0f;
     private float nextActionTime = 0.0f;
     private float period = 0.1f;
+    private float minthreshold = 0.0f;
+    private float maxthreshold = 0.0f;
 
     public float Speed = 3.0f;
 
@@ -36,6 +38,10 @@ public class Movement : MonoBehaviour
         controller = GetComponent<CharacterController>();
         playerCollider = GetComponent<Collider>();
         animator = GetComponent<Animator>();
+
+        float thresholdX = (BalanceBoardManager.Current.XMax - BalanceBoardManager.Current.XMin) / 2.5f;
+        this.maxthreshold = (BalanceBoardManager.Current.XMax + thresholdX);
+        this.minthreshold = (BalanceBoardManager.Current.XMax - thresholdX);
 
         this.updateThread = new Thread(UpdateBalanceBoardMovement);
         this.updateThread.Start();
@@ -72,10 +78,21 @@ public class Movement : MonoBehaviour
 
         if (BalanceBoardManager.Current.IsBalanceBoardConnected)
         {
-            moveVector.x = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.BottomRight * Speed;
+            float centerOfGravityX = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.CenterOfGravity.X;
+            //Debug.Log(centerOfGravityX);
+            if (centerOfGravityX > this.maxthreshold)
+            {
+                moveVector.x = -1 * Speed;
+            }
+            else if (centerOfGravityX < this.minthreshold)
+            {
+                moveVector.x = 1 * Speed;
+            }
         }
-
-        moveVector.x = Input.GetAxisRaw("Horizontal") * Speed;
+        else
+        {
+            moveVector.x = Input.GetAxisRaw("Horizontal") * Speed;
+        }
 
         moveVector.y = vertVelo;
         moveVector.z = Speed;

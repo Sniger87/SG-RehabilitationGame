@@ -27,12 +27,19 @@ public class BalanceBoardMenuScript : MonoBehaviour
     public Text BottomLeft;
     public Text BottomRight;
     public Text Weight;
-    public Text CountdownText;
+    public Text CountdownStepUpText;
+    public Text CountdownStepDownText;
 
     private float nextActionTime = 0.0f;
     private float period = 0.2f;
     private bool updateBalanceBoardState;
     private bool weightUnitLb;
+    private bool isCalibrating;
+    private bool isCalibratingFinished;
+    private bool isCapturingMax;
+    private bool isCapturingMin;
+    private List<float> maxValues;
+    private List<float> minValues;
 
     private CultureInfo currentCulture;
 
@@ -43,7 +50,7 @@ public class BalanceBoardMenuScript : MonoBehaviour
 
         if (BalanceBoardManager.Current.IsBalanceBoardConnected)
         {
-            SetConnectedState();
+            SetConnectedState(false);
         }
         else
         {
@@ -52,6 +59,9 @@ public class BalanceBoardMenuScript : MonoBehaviour
 
         currentCulture = CultureInfo.CurrentCulture;
         weightUnitLb = ConfigManager.Current.GameConfig.WeightUnitLb;
+
+        maxValues = new List<float>();
+        minValues = new List<float>();
     }
 
     private void BalanceBoardConnectionChanged(object sender, BalanceBoardConnectionChangedEventArgs e)
@@ -73,7 +83,7 @@ public class BalanceBoardMenuScript : MonoBehaviour
         {
             if (balanceBoard.IsConnected && balanceBoard.IsInitialized)
             {
-                SetConnectedState();
+                SetConnectedState(true);
             }
             else
             {
@@ -95,7 +105,7 @@ public class BalanceBoardMenuScript : MonoBehaviour
         StatusPanel.SetActive(false);
     }
 
-    private void SetConnectedState()
+    private void SetConnectedState(bool calibrate)
     {
         ConnectButton.interactable = false;
         DisconnectButton.interactable = true;
@@ -103,32 +113,42 @@ public class BalanceBoardMenuScript : MonoBehaviour
         BalanceBoardConnectedImage.SetActive(true);
         BalanceBoardDisconnectedImage.SetActive(false);
         StatusPanel.SetActive(true);
-        // get X value for move
-        StartCoroutine(Calibrate());
+        if (calibrate)
+        {
+            // get X value for move
+            StartCoroutine(Calibrate());
+        }
     }
 
     private IEnumerator Calibrate()
     {
+        isCalibrating = true;
         StepdownImage.SetActive(true);
-        int t = 5;
+        isCapturingMin = true;
+        int t = 10;
         while (t > 0)
         {
-            CountdownText.text = string.Format("{0}",
+            CountdownStepDownText.text = string.Format("{0}",
                 t.ToString());
             yield return new WaitForSeconds(1.0f);
             t--;
         }
+        isCapturingMin = false;
         StepdownImage.SetActive(false);
         StepupImage.SetActive(true);
-        t = 5;
+        isCapturingMax = true;
+        t = 10;
         while (t > 0)
         {
-            CountdownText.text = string.Format("{0}",
+            CountdownStepUpText.text = string.Format("{0}",
                 t.ToString());
             yield return new WaitForSeconds(1.0f);
             t--;
         }
+        isCapturingMax = false;
         StepupImage.SetActive(false);
+        isCalibrating = false;
+        isCalibratingFinished = true;
     }
 
     // Update is called once per frame
@@ -144,25 +164,45 @@ public class BalanceBoardMenuScript : MonoBehaviour
             nextActionTime += period;
             if (BalanceBoardManager.Current.IsBalanceBoardConnected)
             {
-                BalanceBoardManager.Current.BalanceBoard.GetUpdate();
+                BalanceBoard balanceBoard = BalanceBoardManager.Current.BalanceBoard;
+                balanceBoard.GetUpdate();
 
                 if (weightUnitLb)
                 {
-                    this.TopLeft.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesLb.TopLeft.ToString("F4", currentCulture);
-                    this.TopRight.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesLb.TopRight.ToString("F4", currentCulture);
-                    this.BottomLeft.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesLb.BottomLeft.ToString("F4", currentCulture);
-                    this.BottomRight.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesLb.BottomRight.ToString("F4", currentCulture);
-                    this.Weight.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.WeightLb.ToString("F4", currentCulture);
+                    this.TopLeft.text = balanceBoard.WiiControllerState.BalanceBoardState.SensorValuesLb.TopLeft.ToString("F4", currentCulture);
+                    this.TopRight.text = balanceBoard.WiiControllerState.BalanceBoardState.SensorValuesLb.TopRight.ToString("F4", currentCulture);
+                    this.BottomLeft.text = balanceBoard.WiiControllerState.BalanceBoardState.SensorValuesLb.BottomLeft.ToString("F4", currentCulture);
+                    this.BottomRight.text = balanceBoard.WiiControllerState.BalanceBoardState.SensorValuesLb.BottomRight.ToString("F4", currentCulture);
+                    this.Weight.text = balanceBoard.WiiControllerState.BalanceBoardState.WeightLb.ToString("F4", currentCulture);
                 }
                 else
                 {
-                    this.TopLeft.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.TopLeft.ToString("F4", currentCulture);
-                    this.TopRight.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.TopRight.ToString("F4", currentCulture);
-                    this.BottomLeft.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.BottomLeft.ToString("F4", currentCulture);
-                    this.BottomRight.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.BottomRight.ToString("F4", currentCulture);
-                    this.Weight.text = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.WeightKg.ToString("F4", currentCulture);
+                    this.TopLeft.text = balanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.TopLeft.ToString("F4", currentCulture);
+                    this.TopRight.text = balanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.TopRight.ToString("F4", currentCulture);
+                    this.BottomLeft.text = balanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.BottomLeft.ToString("F4", currentCulture);
+                    this.BottomRight.text = balanceBoard.WiiControllerState.BalanceBoardState.SensorValuesKg.BottomRight.ToString("F4", currentCulture);
+                    this.Weight.text = balanceBoard.WiiControllerState.BalanceBoardState.WeightKg.ToString("F4", currentCulture);
+                }
+
+                if (isCalibrating)
+                {
+                    if (isCapturingMin)
+                    {
+                        minValues.Add(balanceBoard.WiiControllerState.BalanceBoardState.CenterOfGravity.X);
+                    }
+                    if (isCapturingMax)
+                    {
+                        maxValues.Add(balanceBoard.WiiControllerState.BalanceBoardState.CenterOfGravity.X);
+                    }
                 }
             }
+        }
+
+        if (isCalibratingFinished)
+        {
+            isCalibratingFinished = false;
+            BalanceBoardManager.Current.XMax = maxValues.Average();
+            BalanceBoardManager.Current.XMin = minValues.Average();
         }
     }
 

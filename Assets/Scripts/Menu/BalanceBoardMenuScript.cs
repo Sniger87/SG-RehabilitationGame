@@ -19,9 +19,11 @@ public class BalanceBoardMenuScript : MonoBehaviour
     public GameObject StatusPanel;
     public GameObject StepdownImage;
     public GameObject StepupImage;
-    public Text InfoText;
+    public GameObject BarPanel;
     public Button ConnectButton;
     public Button DisconnectButton;
+    public Button RecalibrateButton;
+    public Text InfoText;
     public Text TopLeft;
     public Text TopRight;
     public Text BottomLeft;
@@ -29,6 +31,7 @@ public class BalanceBoardMenuScript : MonoBehaviour
     public Text Weight;
     public Text CountdownStepUpText;
     public Text CountdownStepDownText;
+    public RectTransform MovementBar;
 
     private float nextActionTime = 0.0f;
     private float period = 0.2f;
@@ -99,20 +102,24 @@ public class BalanceBoardMenuScript : MonoBehaviour
     {
         ConnectButton.interactable = true;
         DisconnectButton.interactable = false;
+        RecalibrateButton.interactable = false;
         InfoText.text = "disconnect";
         BalanceBoardConnectedImage.SetActive(false);
         BalanceBoardDisconnectedImage.SetActive(true);
         StatusPanel.SetActive(false);
+        BarPanel.SetActive(false);
     }
 
     private void SetConnectedState(bool calibrate)
     {
         ConnectButton.interactable = false;
         DisconnectButton.interactable = true;
+        RecalibrateButton.interactable = true;
         InfoText.text = "connect";
         BalanceBoardConnectedImage.SetActive(true);
         BalanceBoardDisconnectedImage.SetActive(false);
         StatusPanel.SetActive(true);
+        BarPanel.SetActive(true);
         if (calibrate)
         {
             // get X value for move
@@ -204,6 +211,12 @@ public class BalanceBoardMenuScript : MonoBehaviour
             BalanceBoardManager.Current.XMax = maxValues.Average();
             BalanceBoardManager.Current.XMin = minValues.Average();
         }
+
+        if (BalanceBoardManager.Current.IsBalanceBoardConnected && !isCalibrating && !isCalibratingFinished)
+        {
+            float x = BalanceBoardManager.Current.XMax - BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.CenterOfGravity.X;
+            MovementBar.transform.localPosition = new Vector3(x, 0, 0);
+        }
     }
 
     private void OnDestroy()
@@ -223,6 +236,12 @@ public class BalanceBoardMenuScript : MonoBehaviour
         DisconnectingImage.SetActive(true);
 
         BalanceBoardManager.Current.Disconnect();
+    }
+
+    public void Recalibrate()
+    {
+        // get X value for move
+        StartCoroutine(Calibrate());
     }
 
     public void Back()

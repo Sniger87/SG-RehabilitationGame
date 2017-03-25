@@ -7,8 +7,8 @@ TagManager:
   - Obstacle
   - Coin
   - Pause
-  - MenuAudioSource
   - KI
+  - GlobalAudioSource
   layers:
   - Default
   - TransparentFX

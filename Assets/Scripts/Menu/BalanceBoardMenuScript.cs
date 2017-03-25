@@ -17,6 +17,8 @@ public class BalanceBoardMenuScript : MonoBehaviour
     public GameObject BalanceBoardConnectedImage;
     public GameObject BalanceBoardDisconnectedImage;
     public GameObject StatusPanel;
+    public GameObject StepdownImage;
+    public GameObject StepupImage;
     public Text InfoText;
     public Button ConnectButton;
     public Button DisconnectButton;
@@ -25,6 +27,7 @@ public class BalanceBoardMenuScript : MonoBehaviour
     public Text BottomLeft;
     public Text BottomRight;
     public Text Weight;
+    public Text CountdownText;
 
     private float nextActionTime = 0.0f;
     private float period = 0.2f;
@@ -100,6 +103,32 @@ public class BalanceBoardMenuScript : MonoBehaviour
         BalanceBoardConnectedImage.SetActive(true);
         BalanceBoardDisconnectedImage.SetActive(false);
         StatusPanel.SetActive(true);
+        // get X value for move
+        StartCoroutine(Calibrate());
+    }
+
+    private IEnumerator Calibrate()
+    {
+        StepdownImage.SetActive(true);
+        int t = 5;
+        while (t > 0)
+        {
+            CountdownText.text = string.Format("{0}",
+                t.ToString());
+            yield return new WaitForSeconds(1.0f);
+            t--;
+        }
+        StepdownImage.SetActive(false);
+        StepupImage.SetActive(true);
+        t = 5;
+        while (t > 0)
+        {
+            CountdownText.text = string.Format("{0}",
+                t.ToString());
+            yield return new WaitForSeconds(1.0f);
+            t--;
+        }
+        StepupImage.SetActive(false);
     }
 
     // Update is called once per frame

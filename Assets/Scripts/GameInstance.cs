@@ -9,7 +9,9 @@ using UnityEngine.SceneManagement;
 public class GameInstance : MonoBehaviour
 {
     public static GameInstance Instance;
-    public AudioSource MenuAudioSource;
+    public AudioSource AudioSource;
+    public AudioClip MenuClip;
+    public AudioClip GameClip;
 
     // Use this for initialization
     void Start()
@@ -20,13 +22,18 @@ public class GameInstance : MonoBehaviour
 
         ProfileManager.Current.CurrentPlayer = ProfileManager.Current.Players.FirstOrDefault();
 
-        MenuAudioSource = GetComponent<AudioSource>();
-        if (MenuAudioSource.isActiveAndEnabled)
+        if (this.AudioSource == null)
         {
-            MenuAudioSource.tag = "MenuAudioSource";
-            MenuAudioSource.mute = ConfigManager.Current.GameConfig.Mute;
-            MenuAudioSource.volume = ConfigManager.Current.GameConfig.VolumeLevel;
-            DontDestroyOnLoad(MenuAudioSource);
+            this.AudioSource = GetComponent<AudioSource>();
+        }
+        if (this.AudioSource != null && this.AudioSource.isActiveAndEnabled)
+        {
+            this.AudioSource.clip = MenuClip;
+            this.AudioSource.tag = "GlobalAudioSource";
+            this.AudioSource.mute = ConfigManager.Current.GameConfig.MusicMute;
+            this.AudioSource.volume = ConfigManager.Current.GameConfig.MusicVolumeLevel;
+            this.AudioSource.Play();
+            DontDestroyOnLoad(AudioSource);
         }
 
         // Show the first scene
@@ -57,5 +64,25 @@ public class GameInstance : MonoBehaviour
         // Wichtig! Reigenfolge muss eingehalten werden
         ProfileManager.Current.SavePlayers();
         ConfigManager.Current.SaveGameConfig();
+    }
+
+    public void SetGameClip()
+    {
+        if (this.AudioSource != null)
+        {
+            this.AudioSource.Stop();
+            this.AudioSource.clip = GameClip;
+            this.AudioSource.Play();
+        }
+    }
+
+    public void SetMenuClip()
+    {
+        if (this.AudioSource != null)
+        {
+            this.AudioSource.Stop();
+            AudioSource.clip = MenuClip;
+            this.AudioSource.Play();
+        }
     }
 }

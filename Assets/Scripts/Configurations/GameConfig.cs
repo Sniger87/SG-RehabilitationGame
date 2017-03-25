@@ -8,9 +8,13 @@ namespace Configurations
     [Serializable]
     public class GameConfig
     {
-        public float VolumeLevel;
+        public float MusicVolumeLevel;
 
-        public bool Mute;
+        public bool MusicMute;
+
+        public float EffectsVolumeLevel;
+
+        public bool EffectsMute;
 
         public bool WeightUnitLb;
 
@@ -18,8 +22,10 @@ namespace Configurations
 
         public GameConfig()
         {
-            this.Mute = false;
-            this.VolumeLevel = 1.0f;
+            this.MusicMute = false;
+            this.MusicVolumeLevel = 1.0f;
+            this.EffectsMute = false;
+            this.EffectsVolumeLevel = 1.0f;
             this.WeightUnitLb = false;
             this.PlayersConfigPath = new List<string>();
         }

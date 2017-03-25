@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Profiles;
+using Configurations;
 
 public class Collision : MonoBehaviour
 {
@@ -30,6 +31,8 @@ public class Collision : MonoBehaviour
     void Start()
     {
         sourceAudio = gameObject.AddComponent<AudioSource>();
+        sourceAudio.mute = ConfigManager.Current.GameConfig.EffectsMute;
+        sourceAudio.volume = ConfigManager.Current.GameConfig.EffectsVolumeLevel;
         maxCollisions = SpawnManager.Instance.AmountObstacles;
         maxCoins = SpawnManager.Instance.AmountCoins;
         ChangeSuccessBar();
@@ -56,7 +59,6 @@ public class Collision : MonoBehaviour
             PlayFX(CoinAudioFX);
             ChangeSuccessBar();
         }
-
     }
 
     void OnTriggerEnter(Collider col)
@@ -71,7 +73,7 @@ public class Collision : MonoBehaviour
             FinishPanel.SetActive(true);
             //collision data to ki
             KI.Instance.reset(collisionList);
-            //wait 3 seconds
+            //wait 5 seconds
             StartCoroutine(Wait());
         }
     }
@@ -90,12 +92,12 @@ public class Collision : MonoBehaviour
 
     private IEnumerator Wait()
     {
-        int t = 3;
+        int t = 5;
         while (t > 0)
         {
             Countdown.text = string.Format("Next Round in\n{0}",
                 t.ToString());
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(1.0f);
             t--;
         }
         SceneManager.LoadSceneAsync("Game", LoadSceneMode.Single);

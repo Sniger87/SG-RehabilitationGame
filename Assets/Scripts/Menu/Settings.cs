@@ -10,23 +10,27 @@ using UnityEngine.UI;
 public class Settings : MonoBehaviour
 {
     public GameObject LoadImage;
-    public Slider VolumeSlider;
-    public Toggle MuteToggle;
+    public Slider MusicVolumeSlider;
+    public Toggle MusicMuteToggle;
+    public Slider EffectsVolumeSlider;
+    public Toggle EffectsMuteToggle;
     public Toggle WeightUnitToggle;
     AudioSource audioSource;
 
     // Use this for initialization
     void Start()
     {
-        MuteToggle.isOn = ConfigManager.Current.GameConfig.Mute;
+        MusicVolumeSlider.value = ConfigManager.Current.GameConfig.MusicVolumeLevel;
+        EffectsVolumeSlider.value = ConfigManager.Current.GameConfig.EffectsVolumeLevel;
+        MusicMuteToggle.isOn = ConfigManager.Current.GameConfig.MusicMute;
+        EffectsMuteToggle.isOn = ConfigManager.Current.GameConfig.EffectsMute;
         WeightUnitToggle.isOn = ConfigManager.Current.GameConfig.WeightUnitLb;
-        VolumeSlider.value = ConfigManager.Current.GameConfig.VolumeLevel;
 
-        audioSource = GameInstance.Instance.MenuAudioSource;
+        audioSource = GameInstance.Instance.AudioSource;
         if (audioSource != null)
         {
-            audioSource.mute = MuteToggle.isOn;
-            audioSource.volume = VolumeSlider.value;
+            audioSource.mute = MusicMuteToggle.isOn;
+            audioSource.volume = MusicVolumeSlider.value;
         }
     }
 
@@ -42,8 +46,8 @@ public class Settings : MonoBehaviour
         ConfigManager.Current.LoadGameConfig();
         if (audioSource != null)
         {
-            audioSource.mute = ConfigManager.Current.GameConfig.Mute;
-            audioSource.volume = ConfigManager.Current.GameConfig.VolumeLevel;
+            audioSource.mute = ConfigManager.Current.GameConfig.MusicMute;
+            audioSource.volume = ConfigManager.Current.GameConfig.MusicVolumeLevel;
         }
         SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Single);
     }
@@ -51,35 +55,54 @@ public class Settings : MonoBehaviour
     public void Save()
     {
         LoadImage.SetActive(true);
-        ConfigManager.Current.GameConfig.Mute = MuteToggle.isOn;
-        ConfigManager.Current.GameConfig.VolumeLevel = VolumeSlider.value;
+        ConfigManager.Current.GameConfig.MusicMute = MusicMuteToggle.isOn;
+        ConfigManager.Current.GameConfig.MusicVolumeLevel = MusicVolumeSlider.value;
+        ConfigManager.Current.GameConfig.EffectsMute = EffectsMuteToggle.isOn;
+        ConfigManager.Current.GameConfig.EffectsVolumeLevel = EffectsVolumeSlider.value;
         ConfigManager.Current.GameConfig.WeightUnitLb = WeightUnitToggle.isOn;
         ConfigManager.Current.SaveGameConfig();
         SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Single);
     }
 
-    public void OnVolumeChanged()
+    public void OnMusicVolumeChanged()
     {
         if (audioSource != null)
         {
-            audioSource.volume = VolumeSlider.value;
+            audioSource.volume = MusicVolumeSlider.value;
         }
 
-        if (VolumeSlider.value == 0)
+        if (MusicVolumeSlider.value == 0)
         {
-            MuteToggle.isOn = true;
+            MusicMuteToggle.isOn = true;
         }
         else
         {
-            MuteToggle.isOn = false;
+            MusicMuteToggle.isOn = false;
         }
     }
 
-    public void OnMuteChanged()
+    public void OnMusicMuteChanged()
     {
         if (audioSource != null)
         {
-            audioSource.mute = MuteToggle.isOn;
+            audioSource.mute = MusicMuteToggle.isOn;
         }
+    }
+
+    public void OnEffectsVolumeChanged()
+    {
+        if (EffectsVolumeSlider.value == 0)
+        {
+            EffectsMuteToggle.isOn = true;
+        }
+        else
+        {
+            EffectsMuteToggle.isOn = false;
+        }
+    }
+
+    public void OnEffectsMuteChanged()
+    {
+
     }
 }

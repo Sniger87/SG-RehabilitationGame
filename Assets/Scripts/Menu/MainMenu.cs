@@ -53,7 +53,7 @@ public class MainMenu : MonoBehaviour
     {
         // Load scene
         LoadImage.SetActive(true);
-        GameInstance.Instance.MenuAudioSource.Stop();
+        GameInstance.Instance.SetGameClip();
         ProfileManager.Current.CreateFilesForGame();
         SceneManager.LoadSceneAsync("Game", LoadSceneMode.Single);
     }

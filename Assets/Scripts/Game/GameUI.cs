@@ -70,7 +70,7 @@ public class GameUI : MonoBehaviour
             ProfileManager.Current.CurrentPlayer.Highscores.Add(highscore);
         }
         DestroyImmediate(GameObject.FindGameObjectWithTag("KI"), true);
-        GameInstance.Instance.MenuAudioSource.Play();
+        GameInstance.Instance.SetMenuClip();
         SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Single);
     }
 }

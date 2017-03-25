@@ -33,6 +33,7 @@ public class Highscore : MonoBehaviour
         else
         {
             highscores.Sort();
+            highscores.Reverse();
 
             for (int i = 0; i < highscores.Count; i++)
             {

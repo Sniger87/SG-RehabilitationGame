@@ -24,7 +24,8 @@ public class Movement : MonoBehaviour
     private float minthreshold = 0.0f;
     private float maxthreshold = 0.0f;
 
-    public float Speed = 3.0f;
+    public float Speed = 5.0f;
+    public float BalanceBoardSpeed = 3.0f;
 
     // Use this for initialization
     private void Start()
@@ -82,20 +83,21 @@ public class Movement : MonoBehaviour
             //Debug.Log(centerOfGravityX);
             if (centerOfGravityX > this.maxthreshold)
             {
-                moveVector.x = -1 * Speed;
+                moveVector.x = -1 * BalanceBoardSpeed;
             }
             else if (centerOfGravityX < this.minthreshold)
             {
-                moveVector.x = 1 * Speed;
+                moveVector.x = 1 * BalanceBoardSpeed;
             }
+            moveVector.z = BalanceBoardSpeed;
         }
         else
         {
             moveVector.x = Input.GetAxisRaw("Horizontal") * Speed;
+            moveVector.z = Speed;
         }
 
         moveVector.y = vertVelo;
-        moveVector.z = Speed;
         controller.Move(moveVector * Time.deltaTime);
 
         if (playerCollider != null && Time.time > nextActionTime)

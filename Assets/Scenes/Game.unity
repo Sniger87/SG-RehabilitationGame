@@ -1109,7 +1109,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 400042, guid: 6e695732fb04092429f277913c7a7691, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.02
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 400042, guid: 6e695732fb04092429f277913c7a7691, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1936,6 +1936,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Speed: 5
+  BalanceBoardSpeedX: 6
+  BalanceBoardSpeedY: 2
 --- !u!114 &1855099915
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -25,7 +25,8 @@ public class Movement : MonoBehaviour
     private float maxthreshold = 0.0f;
 
     public float Speed = 5.0f;
-    public float BalanceBoardSpeed = 3.0f;
+    public float BalanceBoardSpeedX = 6.0f;
+    public float BalanceBoardSpeedY = 4.0f;
 
     // Use this for initialization
     private void Start()
@@ -34,15 +35,16 @@ public class Movement : MonoBehaviour
         this.positionBuilder.AppendLine("x;y;");
 
         this.movementBuilder = new StringBuilder();
-        this.positionBuilder.AppendLine("TopLeft;TopRight;BottomLeft;BottomRight;");
+        this.movementBuilder.AppendLine("TopLeft;TopRight;BottomLeft;BottomRight;");
 
         controller = GetComponent<CharacterController>();
         playerCollider = GetComponent<Collider>();
         animator = GetComponent<Animator>();
 
-        float thresholdX = (BalanceBoardManager.Current.XMax - BalanceBoardManager.Current.XMin) / 2.5f;
-        this.maxthreshold = (BalanceBoardManager.Current.XMax + thresholdX);
-        this.minthreshold = (BalanceBoardManager.Current.XMax - thresholdX);
+        float thresholdX = (BalanceBoardManager.Current.BalanceBoardState.CenterOfGravityMax.X
+            - BalanceBoardManager.Current.BalanceBoardState.CenterOfGravityMin.X) / 2.5f;
+        this.maxthreshold = (BalanceBoardManager.Current.BalanceBoardState.CenterOfGravityMax.X + thresholdX);
+        this.minthreshold = (BalanceBoardManager.Current.BalanceBoardState.CenterOfGravityMax.X - thresholdX);
 
         this.updateThread = new Thread(UpdateBalanceBoardMovement);
         this.updateThread.Start();
@@ -79,17 +81,17 @@ public class Movement : MonoBehaviour
 
         if (BalanceBoardManager.Current.IsBalanceBoardConnected)
         {
-            float centerOfGravityX = BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.CenterOfGravity.X;
+            float centerOfGravityX = BalanceBoardManager.Current.BalanceBoardState.CenterOfGravity.X;
             //Debug.Log(centerOfGravityX);
             if (centerOfGravityX > this.maxthreshold)
             {
-                moveVector.x = -1 * BalanceBoardSpeed;
+                moveVector.x = -1 * BalanceBoardSpeedX;
             }
             else if (centerOfGravityX < this.minthreshold)
             {
-                moveVector.x = 1 * BalanceBoardSpeed;
+                moveVector.x = 1 * BalanceBoardSpeedX;
             }
-            moveVector.z = BalanceBoardSpeed;
+            moveVector.z = BalanceBoardSpeedY;
         }
         else
         {
@@ -139,7 +141,7 @@ public class Movement : MonoBehaviour
         {
             if (BalanceBoardManager.Current.IsBalanceBoardConnected)
             {
-                BalanceBoardManager.Current.BalanceBoard.GetUpdate();
+                BalanceBoardManager.Current.GetUpdate();
                 this.movementBuilder.AppendLine(string.Format("{0};{1};{2};{3};",
                     BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesRaw.TopLeft,
                     BalanceBoardManager.Current.BalanceBoard.WiiControllerState.BalanceBoardState.SensorValuesRaw.TopRight,
